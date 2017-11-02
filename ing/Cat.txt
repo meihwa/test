@@ -1,0 +1,94 @@
+User Interaction logic ?
+Browser sends request to server and server sends a response.
+-> By means of such request, client is trying to interact with server. Server is able to respond back because some logic is written at server end to fulfil this request.
+-> Logic which will handle the user requests and user’s interaction with server
+Ex: When button is clicked a simple HTTP request is sent to the server. This time the difference is, values in the “Customer Name”, “Address” and “Age” will be sent along with request. Ultimately, if it’s a request then there must be a logic written in the server so that server can send back the response. In short there must be some user interaction logic written on the server.
+
+Execute and Test
+-> In the address bar put “ControllerName/ActionName” 
+Ex : Class Name 	: TestController
+	 ControllerName : Test  -> nama controller slalu tanpa kata controller!
+	 ActionName		: GetString()
+Cara Execute : localhost:8870/Test/GetString
+
+Action method 
+-> is simply a public method inside controller which accepts user’s request and returns some response. 
+-> semua public method akan lgsung jadi action method (hanya action method(public) yang dapat dipanggil dari web), jdi smua non public class tidak dapat dipanggil dari luar
+-> jika ada public method yang tidak ingin dipanggil dari luar maka gunakan [Non Action]
+Ex 1 :
+public class TestController : Controller
+{
+    public string GetString()  //kembalikan hasil berupa string
+    {
+        return "Hello World is old now. It’s time for wassup bro ;)";
+    }
+}
+Ex 2 :
+namespace MvcApplication.Controllers
+{
+    public class Customer
+    {
+        public string CustomerName { get; set; }
+        public string Address { get; set; }
+
+        public override string ToString()
+        {
+            return this.CustomerName + "|" + this.Address;
+        } 
+    }
+	
+	 public class TestController : Controller
+    {
+        //Action method : isiannya methodnya berguna mengembalikan respon ke browser lewat "Return" (semua public method)
+
+        public Customer GetCustomer()
+        {
+            Customer c = new Customer();
+            c.CustomerName = "Customer 1";
+            c.Address = "Address1";
+            return c ; // semua yg balikin obj akan di ToString(), jika ingin liat hasilnya maka override method ToString (diatas)
+        }
+	}
+}
+Ex 3 : 
+[NonAction] //bikin public method bukan sbgai action method
+public string SimpleMethod()
+{
+    return "Hi, I am not action method";
+}
+
+View
+-> view akan disimpan di dalam folder dgn nama yg sama dengan controller dimana kita akan panggil view tsb
+-> jika kita ingin gunakan view untuk bbrpa controller maka taro view di folder shared
+-> Cth view di folder shared : error, layout(seperti master page/template awal)
+-> 1 action method dpt punya lebih dari 1 view
+Ex :
+public ActionResult GetView()
+{
+    if(Some_Condition_Is_Matching)
+    { 
+       return View("MyView");
+    }
+    else
+    {
+       return View("YourView");
+    }
+}
+
+What is the relation between ActionResult and ViewResult?
+-> ActionResult is an abstract class that represents the result of an action method.
+-> abstract class bertindak sebagai base class, derived classnya berupa : ViewResult (View) -> hasilny berupa view, PartialViewResult(PartialView),ContentResult(Content) -> hasilny berupa string ,JsonResult(Json) -> hasilny berupa json ,dll
+-> liat di https://msdn.microsoft.com/en-us/library/system.web.mvc.actionresult(v=vs.118).aspx
+Ex : 
+Misal action result dibawah ini manggil View ( derived class berupa ViewResult) jadi hasil yang dibalikin o/ actionresult ini merupkan hasil dari ViewResult(class anaknya)
+public ActionResult GetView()
+{   
+    Employee emp = new Employee();
+    emp.FirstName = "Sukesh"; //biasany data di dapat dri database
+    emp.LastName = "Marla";
+    emp.Salary = 20000;	
+}
+
+		
+Is it possible to invoke View function without Parameter?
+-> Yes, then it will find the view with name “CurrentActionName”.
