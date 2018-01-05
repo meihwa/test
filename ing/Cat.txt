@@ -87,8 +87,216 @@ public ActionResult GetView()
     emp.FirstName = "Sukesh"; //biasany data di dapat dri database
     emp.LastName = "Marla";
     emp.Salary = 20000;	
+	
+	ViewData["Employee"] = emp;
+	return View("MyView");  //mengembalikan view 
 }
+Cat : Employee ini berupa class yang terdapat dalam Models, jadi harus gunakan : using WebApplication1.Models;
+Ex : - Buat class Employee
+public class Employee
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public int Salary { get; set; }
+}
+Ex : View u/ ViewData
+<div>
+    @{
+        MvcApplication.Models.Employee emp=(MvcApplication.Models.Employee)
+            ViewData["Employee"];
+    }
 
-		
+<b>Employee Details </b><br />
+    Employee Name : @emp.FirstName@emp.LastName <br />
+    Employee Salary: @emp.Salary.ToString("C")
+</div>
+	
 Is it possible to invoke View function without Parameter?
 -> Yes, then it will find the view with name “CurrentActionName”.
+
+ViewBag and ViewData
+-> u/ berkirim2 nilai antara controller dan view
+Ex : ViewBag
+public ActionResult GetView()
+{   
+    Employee emp = new Employee();
+    emp.FirstName = "Sukesh"; //biasany data di dapat dri database
+    emp.LastName = "Marla";
+    emp.Salary = 20000;	
+	
+	ViewBag.Employee = emp;
+	return View("MyView");
+}
+Di View
+@{
+    MvcApplication.Models.Employee a = (MvcApplication.Models.Employee)
+    ViewBag.Employee;
+}
+        
+<b>Employee Details (ViewBag) </b><br />
+Employee Name : @a.FirstName @a.LastName <br />   @*bisa diganti jadi @(a.FirstName+" "+a.LastName) *@
+Employee Salary: @a.Salary.ToString("C")
+
+The problem with ViewData & ViewBag
+- Performance Issues
+ViewData & ViewBag (smpan data bertipe obj)-> harus cast value ke tipe yg bener sblm bisa digunakan , klw ga runtime error (harus ati2)
+- No Type safety and no compile time errors
+Jika salah cast tipe data / salah kirim key maka akan langsung dapat runtime error
+- No Proper connection between Data sent and Data Received
+*Controller dan View tidak sadar sama sekali apa yg terjadi pada satu sama lain. Jadi jika kita kirim data dari controller ke view, kita harus hafal tipe data apa yg kita kirim, agar bisa kita tangkap di View.
+*Jika programmer u/ view dan controller berbeda, hal ini akan sangat sulit dan akan sering menghasilkan runtime error.
+
+Untuk masalah diatas gunakan strongly typed view (gunakan ini u/ menggantikan ViewBag dan ViewData)
+Ex : View
+-Paling atas deklarasi : 
+@model WebApplication1.Models.Employee 
+atau gunakan :
+@using WebApplication1.Models
+@model Employee
+
+Lalu letakan ini di dalam body :
+Employee Name : @Model.FirstName @Model.LastName 
+@if(Model.Salary>15000)
+{
+    <span style="background-color:yellow">
+        Employee Salary: @Model.Salary.ToString("C")
+    </span>
+}
+else
+{           
+    <span style="background-color:green">
+        Employee Salary: @Model.Salary.ToString("C")
+    </span>
+}
+Di Controller :
+public ActionResult GetView()
+{   
+	Employee emp = new Employee();
+	emp.FirstName = "Sukesh";
+	emp.LastName="Marla";
+	emp.Salary = 20000;           
+	return View("MyView",emp);
+}
+
+Hal-hal yang mengasari MVC Arsitektur (berdasarkan cth di View) :
+- Concat FirstName dan LastName di View ( @(a.FirstName+" "+a.LastName) )
+- Tampilin Salary dgn Currency (.ToString("C"))
+- Tampilin Salary dgn warna yg berbeda 
+@if(Model.Salary>15000)
+{
+    <span style="background-color:yellow">
+        Employee Salary: @Model.Salary.ToString("C")
+    </span>
+}
+Cat : View harus pure UI 
+Solusi : Gunakan ViewModel
+Cth :
+1. Buat ViewModel
+public class EmployeeViewModel
+{
+    public string EmployeeName { get; set; }  //ini gabungan dari FirstName dan LastName dari Model Employee
+    public string Salary { get; set; }		 // Nilai Currency di coding lewat controller
+    public string SalaryColor { get; set; }  //gunakan ini agar tidak perlu menggunakan coding color di View, taro 		coding di controller
+    public string UserName { get; set; }
+}
+2. Di Controller
+public ActionResult GetView()
+{
+    //Model
+	//Tarik nilai dari Model
+    Employee emp = new Employee();
+    emp.FirstName = "Sukesh";
+    emp.LastName="Marla";
+    emp.Salary = 20000;
+
+    //ViewModel
+    //Berguna seperti view, model sebagai tabel ny
+    //Jadi klw ada yang ga bisa ditampilin dari tabel, mis: hasil field Salary di tabel ingin ditampilkan berdasarkan warna
+    //Di view kita bikin field warna untuk nampung warna salary yang nanti nya akan di tampilkan di View MVC (ingat : Harus pure UI)
+    //Masukkan nilai dari Model Employee ke ViewModel
+    EmployeeViewModel vmEmp = new EmployeeViewModel();
+    vmEmp.EmployeeName = emp.FirstName + " " + emp.LastName;
+    vmEmp.Salary = emp.Salary.ToString("C");
+    if(emp.Salary>15000)
+    {
+        vmEmp.SalaryColor="yellow";
+    }
+    else
+    {
+        vmEmp.SalaryColor = "green";
+    }
+
+    vmEmp.UserName = "Admin";
+
+    return View("MyView", vmEmp);
+}
+3. Di View (Disini pure UI, semua codinggan pindah ke controller)
+<div>
+    Hello @Model.UserName
+
+    <div>
+        <b>Employee Details</b>
+        <br />
+        Employee Name : @Model.EmployeeName 
+        <br />
+        <span style="background-color:@Model.SalaryColor">
+            Employee Salary: @Model.Salary
+        </span>
+    </div>
+</div>
+	
+Problem Issues with strongly typed view
+-> hanya dapat menggunakan 1 model untuk tiap view, padahal di kenyataannya kita sering menggunakan lebih dari 1 model
+Solusi : gunakan ViewModel
+
+ViewModel
+-> salah satu layer yg tak terlihat di MVC , terletak di antaran Model dan View dan bertindak sebagai data container bagi View 
+
+Beda ViewModel dan Model
+-> Model is Business specific data. It will be created based on Business and Database structure. ViewModel is View specific data. It will be created based on the View.
+
+Cara connect View dan ViewModel
+-> View akan menjadi strongly type view dari ViewModel
+
+Cara connect Model dan ViewModel
+-> Model dan ViewModel harus independent satu sama lain.
+-> Controller akan buat dan inisialisasi object ViewModel berdasarkan 1/ lebih object Model.
+
+Haruskan selalu buat ViewModel ? Apa jika View tidak munculin presentation logic (seperti if, currency, for, dll) dan hanya menampilkan data seperti di Model (tanpa modif apa pun) ?
+-> Ya , Setiap View harus punya View Model meskipun View Model itu isinya sama seperti Model (View tidak ad presentation logic seperti concat, currency, color, dll)
+Cth : View tidak berisi presentation logic (hanya pake Model), klw d masa dpn ingin di tambahkan presentation logic maka harus rombak codingan di Controller dan bikin View Model. Jadi lebih baik bikin View Model dari awal untuk berjaga2
+
+Entity Framework di simple words ?
+-> ORM(Object Relational Mapping) tool dari Microsoft.
+ORM otomatis membuat :
+1. Tulis kode u/ berkomunikasi dgn database(Data Access Layer/Database Logic).
+2. Tulis kode u/ mapping data dari Database ke object oriented data / sebaliknya.
+
+Data Access Layer (DAL) 
+-> berguna untuk komunikasi dengan database 
+-> DAL ada di codingan project kita, jadi saat controller perlu data dari database, bisa gunakan DAL sebagai sarana komunikasi(minta/terima data)
+
+3 Pendekatan di Entity Framework(EF) :
+-> Database First Approach : buat database dengan table, kolum, relation, dll. Lalu EF akan generate Model class(Business entities) dan Data Acces Layernya yang berhubungan dengan database tsb.
+-> Model First Approach : Model class dan hubungan diantaranya akan di buat secara manual dgn Model designer di Visual Studio dan EF akan generate DAL dan Database dgn table, kolum dan relation secara otomatis.
+-> Code First Approach : POCO classes akan dibuat manual. Hubungan antara kelas2 tsb didefinisikan berdasarkan kode yg ada. EF akan generate DAL dan Database dgn table, kolum, dan relation secara otomatis di database server.
+
+POCO Classes ?
+-> Plain Old CLR Object (POCO) : simple .NET class yang kita buat.
+Cth : class employee
+
+Cara buat Key di Model ?
+1. Tambahkan using System.ComponentModel.DataAnnotations;
+2. [Key] : untuk primary key
+Cth :
+public class Employee
+{
+    [Key]
+    public int EmployeeId  { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public int Salary { get; set; }
+}
+
+DbSet ? 
+will represent all the employees that can be queried from the database.

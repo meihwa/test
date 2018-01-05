@@ -1,0 +1,131 @@
+Web service adalah standar yang digunakan untuk melakukan pertukaran data antar aplikasi atau sistem, karena aplikasi yang melakukan pertukaran data bisa ditulis dengan bahasa pemrograman(Java dan Phyton, .NET dan Android, dll) yang berbeda atau berjalan pada platform yang berbeda(Linux dan Windows, Linux dan MAC , dll). Contoh implementasi dari web service antara lain adalah SOAP dan REST.
+
+Web service yang berbasis arsitektur REST kemudian dikenal sebagai RESTful web services.
+
+REST ( Representational State Transfer) itu arsitektur komunikasi berbasis web yang sering diterapkan dalam pengembangan layanan berbasis web. Umumnya menggunakan HTTP (Hypertext Transfer Protocol) sebagai protocol untuk komunikasi data. 
+
+API adalah singkatan dari Application Programming Interface. Merupakan suatu “penghubung” yang memungkinkan suatu aplikasi untuk berinteraksi dengan aplikasi lainnya dan berbagi data
+
+Pada arsitektur REST, REST server menyediakan resources (sumber daya/data) dan REST client mengakses dan menampilkan resource tersebut untuk penggunaan selanjutnya. Setiap resource diidentifikasi oleh URIs (Universal Resource Identifiers) atau global ID. Resource tersebut direpresentasikan dalam bentuk format teks, JSON atau XML. 
+
+Rest memperlakukan setiap content sebagai resource (text files, html pages, images, videos or dynamic business data)
+
+JSON (JavaScript Object Notation), beberapa ciri-ciri JSON.
+    Mudah di urai, bahkan oleh javascript pada sisi client, hanya object biasa
+    Data transport lebih kecil
+    Proses urai lebih cepat
+
+XML (Extensible Markup Language), beberapa ciri-ciri XML
+    Butuh XML Document untuk mengurai seperti Xpath
+    Data transport lebih besar
+    Proses urai lebih lambat
+
+Cara Kerja RESTful web services :
+Sebuah client mengirimkan sebuah data atau request melalui HTTP Request dan kemudian server merespon melalui HTTP Response. 
+
+Komponen dari http request :
+    Verb, HTTP method yang digunakan misalnya GET, POST, DELETE, PUT dll.
+    Uniform Resource Identifier  (URI) untuk mengidentifikasikan lokasi resource pada server. (resource dapat berupa : Text Files, Html Pages, Images, Videos or Dynamic Business Data)
+    HTTP Version, menunjukkan versi dari HTTP yang digunakan, contoh HTTP v1.1.
+    Request Header, berisi metadata untuk HTTP Request. Contoh, type client/browser, format yang didukung oleh client, format dari body pesan, seting cache dll.
+    Request Body, konten dari data.
+
+Sedangkan komponen dari http response :
+    Status/Response Code, mengindikasikan status server terhadap resource yang direquest. misal : 404, artinya resource tidak ditemukan dan 200 response OK.
+    HTTP Version, menunjukkan versi dari HTTP yang digunakan, contoh HTTP v1.1.
+    Response Header, berisi metadata untuk HTTP Response. Contoh, type server, panjang content, tipe content, waktu response, dll
+    Response Body, konten dari data yang diberikan.
+
+Format URI :
+<protocol>://<service-name>/<ResourceType>/<ResourceID>
+Cth :
+http://localhost:8080/UserManagement/rest/UserService/users/1
+
+Keuntungan REST
+    bahasa dan platform agnostic
+    lebih sederhana/simpel untuk dikembangkan ketimbang SOAP
+    mudah dipelajari, tidak bergantung pada tools
+    ringkas, tidak membutuhkan layer pertukaran pesan (messaging) tambahan
+    secara desain dan filosofi lebih dekat dengan web
+
+Kelemahan REST
+    Mengasumsi model point-to-point komunikasi - tidak dapat digunakan untuk lingkungan komputasi terdistribusi di mana pesan akan melalui satu atau lebih perantara
+    Kurangnya dukungan standar untuk keamanan, kebijakan, keandalan pesan, dll, sehingga layanan yang mempunyai persyaratan lebih canggih lebih sulit untuk dikembangkan ("dipecahkan sendiri")
+    Berkaitan dengan model transport HTTP
+
+Berikut metode HTTP yang umum digunakan dalam arsitektur berbasis REST.
+    GET, menyediakan hanya akses baca pada resource
+    PUT, digunakan untuk menciptakan resource baru
+    DELETE, digunakan untuk menghapus resource
+    POST, digunakan untuk memperbarui resource yang ada atau membuat resource baru
+    OPTIONS, digunakan untuk mendapatkan operasi yang disupport pada resource
+
+Sr.No. 	HTTP Method 		URI 					Operation 								Operation Type
+1 			GET 	/UserService/users 			Get list of users 								Read Only
+2 			GET 	/UserService/users/1 		Get User with Id 1 								Read Only
+3 			PUT 	/UserService/users/2 		Insert User with Id 2 							Idempotent
+4 			POST 	/UserService/users/2 		Update User with Id 2 								N/A
+5 		  DELETE 	/UserService/users/1 		Delete User with Id 1 							Idempotent
+6 		  OPTIONS 	/UserService/users 		List the supported operations in web service 		Read Only	
+7		   HEAD		/UserService/users			Returns only HTTP Header, no Body				Read Only
+
+Indempotent :hasilnya akan selalu sama berapa kali pun dipanggil
+
+Dalam arsitektur REST, seharusnya tidak boleh menyimpan state atau penanda dari client di server. Hal ini disebut sebagai stateless atau statelessness. Contohnya pada kasus session, dimana session merupakan penanda client yang disimpan diserver. Nah session pada arsitektur REST tidak diperbolehkan.
+
+Keuntungan dari stateless antara lain:
+- Web services dapat melayani masing2 request secara independent.
+- Web services tidak perlu memaintain state user, hal ini tentu membuat desain application lebih sederhana.
+- HTTP merupakan protokol yang bersifat stateless.
+
+Sedangkan kerugian dari stateless yaitu: Web services membutuhkan informasi tambahan pada masing-masing request untuk menerjemahkan request dan state dari client.
+
+Target utama dari stateless sebenarnya adalah untuk scale-up concurrent akses terhadap aplikasi. Karena app tidak perlu menyimpan state dari client sehingga meningkatkan jumlah service terhadap request pada satu waktu.
+
+Caching : simpan respone dari server di client, jadi client tidak perlu melakukan server request u/ resource yg sama lagi dan lagi
+
+Sr.No.	HTTP Code & Description
+1		200
+		OK − shows success.
+2		201
+		CREATED − when a resource is successfully created using POST or PUT request. Returns link to the newly created resource using the location header.
+3		204
+		NO CONTENT − when response body is empty. For example, a DELETE request.
+4		304
+		NOT MODIFIED − used to reduce network bandwidth usage in case of conditional GET requests. Response body should be empty. Headers should have date, location, etc.
+5		400
+		BAD REQUEST − states that an invalid input is provided. For example, validation error, missing data.
+6		401
+		UNAUTHORIZED − states that user is using invalid or wrong authentication token.
+7		403
+		FORBIDDEN − states that the user is not having access to the method being used. For example, Delete access without admin rights.
+8		404
+		NOT FOUND − states that the method is not available.
+9		409
+		CONFLICT − states conflict situation while executing the method. For example, adding duplicate entry.
+10		500
+		INTERNAL SERVER ERROR − states that the server has thrown some exception while executing the method.
+
+SOAP (Simple Object Access Protocol) adalah standar untuk bertukar pesan-pesan berbasis XML melalui jaringan komputer atau sebuah jalan untuk program yang berjalan pada suatu sistem operasi (OS) untuk berkomunikasi dengan program pada OS yang sama maupun berbeda dengan menggunakan HTTP dan XML sebagai mekanisme untuk pertukaran data
+
+Kelebihan SOAP
+    bahasa, platform, dan transport agnostic
+    dirancang untuk menangani lingkungan komputasi terdistribusi
+    merupakan standar yang berlaku untuk web servis, sehingga mempunyai dukungan yang lebih baik dari standar yang lain (WSDL, WS-*) dan tools dari berbagai vendor
+    built-in error handling (faults)
+    extensibility
+
+Kekurangan SOAP
+    secara konseptual lebih sulit, lebih "heavy-weight" dibanding REST
+    lebih "verbose" (membutuhkan lebih banyak pernyataan/kode program)
+    sulit untuk dikembangkan, mebutuhkan tools
+
+Sebuah pesan SOAP adalah sebuah dokumen XML yang berisi elemen-elemen berikut:
+    Envelope element yang mengidentifikasi dokumen XML sebagai sebuah pesan SOAP.
+    Header element yang berisi informasi header.
+    Body element yang berisi panggilan dan merespon informasi.
+    Fault element yang berisi pesan kesalahan yang terjadi pada waktu proses.
+
+.NET
+What is Entity Framework in simple words?
+- It’s an ORM tool. ORM stands for Object Relational Mapping.
