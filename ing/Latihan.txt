@@ -1,5 +1,17 @@
 Web service adalah standar yang digunakan untuk melakukan pertukaran data antar aplikasi atau sistem, karena aplikasi yang melakukan pertukaran data bisa ditulis dengan bahasa pemrograman(Java dan Phyton, .NET dan Android, dll) yang berbeda atau berjalan pada platform yang berbeda(Linux dan Windows, Linux dan MAC , dll). Contoh implementasi dari web service antara lain adalah SOAP dan REST.
 
+Diagram Web Service
+1. Client --request ke server--> server (server hosting the web services)
+Cat :
+- request dibuat melalui remote procedure call(RPC)
+- Remote Procedure Calls(RPC) are calls made to methods which are hosted by the relevant web service.
+2. Server --respone dari server ke client--> client
+
+Component utama Web Service
+- XML
+- JSON
+Cat : tergantung web service nya REST / SOAP
+
 Web service yang berbasis arsitektur REST kemudian dikenal sebagai RESTful web services.
 
 REST ( Representational State Transfer) itu arsitektur komunikasi berbasis web yang sering diterapkan dalam pengembangan layanan berbasis web. Umumnya menggunakan HTTP (Hypertext Transfer Protocol) sebagai protocol untuk komunikasi data. 
