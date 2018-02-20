@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">movies.iak</string>
+
+    <!--PUT YOUR API KEY HERE-->
+    <string name="api_key"></string>
+
+    <!--ITEM-->
+    <string name="text_name" translatable="false">Movie Name</string>
+    <string name="text_overview" translatable="false">Movie Overview</string>
+
+</resources>
