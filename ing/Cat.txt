@@ -46,7 +46,7 @@ namespace MvcApplication.Controllers
             Customer c = new Customer();
             c.CustomerName = "Customer 1";
             c.Address = "Address1";
-            return c ; // semua yg balikin obj akan di ToString(), jika ingin liat hasilnya maka override method ToString (diatas)
+            return c ; // semua yg balikin obj akan di ToString(), jika ingin liat hasilnya maka override method ToString (diatas). Hasilnya Customer 1|Address1 
         }
 	}
 }
@@ -71,12 +71,13 @@ public ActionResult GetView()
     }
     else
     {
-       return View("YourView");
+       return View("YourView");  //function View ini akan mengembalikan ViewResult 
     }
 }
 
 What is the relation between ActionResult and ViewResult?
 -> ActionResult is an abstract class that represents the result of an action method.
+-> ViewResult adalah multi level child dari ActionResult (ActionResult -> ViewResultBase -> ViewResult -> View)
 -> abstract class bertindak sebagai base class, derived classnya berupa : ViewResult (View) -> hasilny berupa view, PartialViewResult(PartialView),ContentResult(Content) -> hasilny berupa string ,JsonResult(Json) -> hasilny berupa json ,dll
 -> liat di https://msdn.microsoft.com/en-us/library/system.web.mvc.actionresult(v=vs.118).aspx
 Ex : 
