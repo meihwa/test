@@ -1,0 +1,35 @@
+DECLARE @NoData INT ,@KD VARCHAR(30), @i INT
+SET @KD = 'WP'
+SET @i = 0
+
+DECLARE PJK CURSOR FOR
+
+SELECT NoDataWajibPajak
+FROM PJK_WajibPajak
+WHERE NoDataWajibPajak > 900
+
+OPEN PJK
+FETCH NEXT FROM PJK INTO @NoData 
+
+WHILE @@FETCH_STATUS = 0  
+BEGIN  
+	SET @i = @i + 1
+
+	IF LEN(@i) = 1
+		SET @KD = @KD + '160000' + CONVERT(VARCHAR(MAX),@i)
+	ELSE IF LEN(@I) = 2
+		SET @KD = @KD + '16000' + CONVERT(VARCHAR(MAX),@i)
+	ELSE IF LEN(@I) = 3
+		SET @KD = @KD + '1600' + CONVERT(VARCHAR(MAX),@i)
+
+	UPDATE PJK_WajibPajak
+	SET KodeWajibPajak = @KD
+	WHERE NoDataWajibPajak = @NoData
+	
+	SET @KD = 'WP'
+	FETCH NEXT FROM PJK INTO @NoData  
+END
+
+CLOSE PJK
+DEALLOCATE PJK
+

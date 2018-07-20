@@ -1,0 +1,12 @@
+Langkah-Langkah buat project baru
+1.pilih new project
+2.pilih template presentation
+3.ganti solution name dgn nama project
+4.ganti (.template.) pada name dgn prefix dari nama project yg di buat
+5.add new project pada solution (tambahkan template business facade, common, datamapper,sp service, domain object,reportservice)
+Cat : .template. d gnti dgn prefix dari nama project
+6.buka properti pada masing2 template, perbaiki preference 
+7.pada properti bg application u/ business facade, common, datamapper, domain object : nama root dicopy ke nama assembly, sementara nama root di kosongkan
+8.u/ template yg lain : nama root di copy ke nama assembly
+9.ctrl +shift+h : ganti .template. dgn .namaprefix.
+10.build program nya

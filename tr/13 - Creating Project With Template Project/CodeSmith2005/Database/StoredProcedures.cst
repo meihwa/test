@@ -1,0 +1,1096 @@
+<%@
+	CodeTemplate Language="C#"
+		Inherits="CodeSmith.BaseTemplates.SqlCodeTemplate"
+		TargetLanguage="T-SQL"
+		Description="Generates SELECT/INSERT/UPDATE/DELETE stored procedure based on a database table schema."
+%>
+
+<%@
+	Property Name="SourceTable"
+		Type="SchemaExplorer.TableSchema"
+		Category="Context"
+		Description="Table that the stored procedures should be based on."
+%>
+<%@
+	Property Name="RemoveSuffix_S"
+		Type="System.Boolean"
+		Category="Context"
+		Default="False"
+		Description="Table that the stored procedures should be based on."
+%>
+<%@
+	Property Name="IncludeDrop"
+		Type="System.Boolean"
+		Default="True"
+		Category="Options"
+		Description="If true drop statements will be generated to drop existing stored procedures."
+%>
+<%@
+	Property Name="IncludeCreate"
+		Type="System.Boolean"
+		Default="True"
+		Category="Options"
+		Description="If true create statements will be generated."
+%>
+<%@
+	Property Name="IncludeRetrieve"
+		Type="System.Boolean"
+		Default="True"
+		Category="Options"
+		Description="If true retrieve statements will be generated."
+%>
+<%@
+	Property Name="IncludeRetrieveList"
+		Type="System.Boolean"
+		Default="True"
+		Category="Options"
+		Description="If true retrieve list statements will be generated."
+%>
+
+<%@
+	Property Name="IncludeRetrieveWithCondition"
+		Type="System.Boolean"
+		Default="True"
+		Category="Options"
+		Description="If true retrieve list statements will be generated."
+%>
+
+<%@
+	Property Name="IncludeRetrievePagingList"
+		Type="System.Boolean"
+		Default="True"
+		Category="Options"
+		Description="If true retrieve list statements will be generated."
+%>
+<%@
+	Property Name="IncludeRetrievePagingRowCount"
+		Type="System.Boolean"
+		Default="True"
+		Category="Options"
+		Description="If true retrieve list statements will be generated."
+%>
+<%@
+	Property Name="IncludeUpdate"
+		Type="System.Boolean"
+		Default="True"
+		Category="Options"
+		Description="If true update statements will be generated."
+%>
+<%@
+	Property Name="IncludeDelete"
+		Type="System.Boolean"
+		Default="True"
+		Category="Options"
+		Description="If true delete statements will be generated."
+%>
+<%@
+	Property Name="IncludeValidate"
+		Type="System.Boolean"
+		Default="False"
+		Category="Options"
+		Description="If true insert statements will be generated."
+%>
+<%@
+	Property Name="IsolationLevel"
+		Type="TransactionIsolationLevelEnum"
+		Default="ReadCommitted"
+		Category="Options"
+		Description="Isolation level to use in generated procedures."
+%>
+<%@
+	Property Name="CreatePrefix"
+		Type="System.String"
+		Default="USP_"
+		Category="Style"
+		Description="Prefix to use for all generated CREATE stored procedures."
+%>
+<%@
+	Property Name="CreateSuffix"
+		Type="System.String"
+		Default="Insert"
+		Category="Style"
+		Description="Prefix to use for all generated CREATE stored procedures."
+%>
+<%@
+	Property Name="RetrievePrefix"
+		Type="System.String"
+		Default="USP_"
+		Category="Style"
+		Description="Prefix to use for all generated RETRIEVE stored procedures."
+%>
+<%@
+	Property Name="RetrieveSuffix"
+		Type="System.String"
+		Default="Retrieve"
+		Category="Style"
+		Description="Prefix to use for all generated RETRIEVE stored procedures."
+%>
+<%@
+	Property Name="RetrieveListPrefix"
+		Type="System.String"
+		Default="USP_"
+		Category="Style"
+		Description="Prefix to use for all generated RETRIEVE LIST stored procedures."
+%>
+<%@
+	Property Name="RetrieveListSuffix"
+		Type="System.String"
+		Default="RetrieveList"
+		Category="Style"
+		Description="Prefix to use for all generated RETRIEVE LIST stored procedures."
+%>
+
+<%@
+	Property Name="RetrieveWithConditionPrefix"
+		Type="System.String"
+		Default="USP_"
+		Category="Style"
+		Description="Prefix to use for all generated RETRIEVE LIST stored procedures."
+%>
+<%@
+	Property Name="RetrieveWithConditionSuffix"
+		Type="System.String"
+		Default="RetrieveWithCondition"
+		Category="Style"
+		Description="Prefix to use for all generated RETRIEVE LIST stored procedures."
+%>
+
+<%@
+	Property Name="RetrievePagingListPrefix"
+		Type="System.String"
+		Default="USP_"
+		Category="Style"
+		Description="Prefix to use for all generated RETRIEVE LIST stored procedures."
+%>
+<%@
+	Property Name="RetrievePagingListSuffix"
+		Type="System.String"
+		Default="RetrievePagingList"
+		Category="Style"
+		Description="Prefix to use for all generated RETRIEVE LIST stored procedures."
+%>
+<%@
+	Property Name="RetrievePagingRowCount"
+		Type="System.String"
+		Default="USP_"
+		Category="Style"
+		Description="Prefix to use for all generated RETRIEVE LIST stored procedures."
+%>
+<%@
+	Property Name="RetrievePagingRowCountSuffix"
+		Type="System.String"
+		Default="RetrievePagingRowCount"
+		Category="Style"
+		Description="Prefix to use for all generated RETRIEVE LIST stored procedures."
+%>
+<%@
+	Property Name="UpdatePrefix"
+		Type="System.String"
+		Default="USP_"
+		Category="Style"
+		Description="Prefix to use for all generated UPDATE stored procedures."
+%>
+<%@
+	Property Name="UpdateSuffix"
+		Type="System.String"
+		Default="Update"
+		Category="Style"
+		Description="Prefix to use for all generated UPDATE stored procedures."
+%>
+<%@
+	Property Name="DeletePrefix"
+		Type="System.String"
+		Default="USP_"
+		Category="Style"
+		Description="Prefix to use for all generated DELETE stored procedures."
+%>
+<%@
+	Property Name="DeleteSuffix"
+		Type="System.String"
+		Default="Delete"
+		Category="Style"
+		Description="Prefix to use for all generated DELETE stored procedures."
+%>
+<%@
+	Property Name="ValidatePrefix"
+		Type="System.String"
+		Default="USP_"
+		Category="Style"
+		Description="Prefix to use for all generated VALIDATE stored procedures."
+%>
+<%@
+	Property Name="ValidateSuffix"
+		Type="System.String"
+		Default="Validate"
+		Category="Style"
+		Description="Prefix to use for all generated VALIDATE stored procedures."
+%>
+<%@
+	Property Name="Author"
+		Type="System.String"		
+		Category="Style"
+		Default="IMFI DEVELOPMENT TEAM"
+		Description="Author generated stored procedures."
+%>
+
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Assembly Name="CodeSmith.BaseTemplates" %>
+
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Import Namespace="System.Data" %>
+
+<%-- THROW EXCEPTION IF NO PRIMARY KEYS ---%>
+<%
+	if (SourceTable.PrimaryKey == null)
+	
+		throw new ApplicationException("SourceTable does not contain a primary key.");
+	
+%>
+
+<%-- INCLUDE DROP? --%>
+<%
+	if (IncludeDrop)
+	{
+%>
+	<%-- INCLUDE CREATE? --%>
+	<%
+		if (this.IncludeCreate)
+		{
+	%>
+/****** Object:  Stored Procedure <%= this.TableOwner %>[<%= this.UpdatePrefix %><%= this.EntityName %><%= this.UpdateSuffix %>]    Script Date: <%= DateTime.Now.ToLongDateString() %> ******/
+IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id(N'<%= this.TableOwner %>[<%= this.CreatePrefix %><%= this.EntityName %><%= this.CreateSuffix %>]') AND OBJECTPROPERTY(id, N'IsProcedure') = 1)
+DROP PROCEDURE <%= this.TableOwner %>[<%= this.CreatePrefix %><%= this.EntityName %><%= this.CreateSuffix %>]
+GO
+
+	<%
+		}
+	%>
+
+	<%-- INCLUDE RETRIEVE? --%>
+	<%
+		if (this.IncludeRetrieve)
+		{
+	%>
+/****** Object:  Stored Procedure <%= this.TableOwner %>[<%= this.RetrievePrefix %><%= this.EntityName %><%= this.RetrieveSuffix %>]    Script Date: <%= DateTime.Now.ToLongDateString() %> ******/
+IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id(N'<%= this.TableOwner %>[<%= this.RetrievePrefix %><%= this.EntityName %><%= this.RetrieveSuffix %>]') AND OBJECTPROPERTY(id, N'IsProcedure') = 1)
+DROP PROCEDURE <%= this.TableOwner %>[<%= this.RetrievePrefix %><%= this.EntityName %><%= this.RetrieveSuffix %>]
+GO
+
+	<%
+		}
+	%>
+
+	<%-- INCLUDE RETRIEVE LIST? --%>
+	<%
+		if (this.IncludeRetrieveList)
+		{
+	%>
+/****** Object:  Stored Procedure <%= this.TableOwner %>[<%= this.RetrieveListPrefix %><%= this.EntityName %><%= this.RetrieveListSuffix %>]    Script Date: <%= DateTime.Now.ToLongDateString() %> ******/
+IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id(N'<%= this.TableOwner %>[<%= this.RetrieveListPrefix %><%= this.EntityName %><%= this.RetrieveListSuffix %>]') AND OBJECTPROPERTY(id, N'IsProcedure') = 1)
+DROP PROCEDURE <%= this.TableOwner %>[<%= this.RetrieveListPrefix %><%= this.EntityName %><%= this.RetrieveListSuffix %>]
+GO
+
+	<%
+		}
+	%>
+
+<%-- INCLUDE RETRIEVE WITH CONDITION? --%>
+	<%
+		if (this.IncludeRetrieveWithCondition)
+		{
+	%>
+/****** Object:  Stored Procedure <%= this.TableOwner %>[<%= this.RetrieveWithConditionPrefix %><%= this.EntityName %><%= this.RetrieveWithConditionSuffix %>]    Script Date: <%= DateTime.Now.ToLongDateString() %> ******/
+IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id(N'<%= this.TableOwner %>[<%= this.RetrieveWithConditionPrefix %><%= this.EntityName %><%= this.RetrieveWithConditionSuffix %>]') AND OBJECTPROPERTY(id, N'IsProcedure') = 1)
+DROP PROCEDURE <%= this.TableOwner %>[<%= this.RetrieveWithConditionPrefix %><%= this.EntityName %><%= this.RetrieveWithConditionSuffix %>]
+GO
+
+	<%
+		}
+	%>
+	
+	<%-- INCLUDE UPDATE? --%>
+	<%
+		if (this.IncludeUpdate)
+		{
+	%>
+/****** Object:  Stored Procedure <%= this.TableOwner %>[<%= this.UpdatePrefix %><%= this.EntityName %><%= this.UpdateSuffix %>]    Script Date: <%= DateTime.Now.ToLongDateString() %> ******/
+IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id(N'<%= this.TableOwner %>[<%= this.UpdatePrefix %><%= this.EntityName %><%= this.UpdateSuffix %>]') AND OBJECTPROPERTY(id, N'IsProcedure') = 1)
+DROP PROCEDURE <%= this.TableOwner %>[<%= this.UpdatePrefix %><%= this.EntityName %><%= this.UpdateSuffix %>]
+GO
+
+	<%
+		}
+	%>
+
+	<%-- INCLUDE DELETE? --%>
+	<%
+		if (this.IncludeDelete)
+		{
+	%>
+/****** Object:  Stored Procedure <%= this.TableOwner %>[<%= this.DeletePrefix %><%= this.EntityName %><%= this.DeleteSuffix %>]    Script Date: <%= DateTime.Now.ToLongDateString() %> ******/
+IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id(N'<%= this.TableOwner %>[<%= this.DeletePrefix %><%= this.EntityName %><%= this.DeleteSuffix %>]') AND OBJECTPROPERTY(id, N'IsProcedure') = 1)
+DROP PROCEDURE <%= this.TableOwner %>[<%= this.DeletePrefix %><%= this.EntityName %><%= this.DeleteSuffix %>]
+GO
+
+	<%
+		}
+	%>
+
+	<%-- INCLUDE VALIDATE? --%>
+	<%
+		if (this.IncludeValidate)
+		{
+	%>
+/****** Object:  Stored Procedure <%= this.TableOwner %>[<%= this.ValidatePrefix %><%= this.EntityName %><%= this.ValidateSuffix %>]    Script Date: <%= DateTime.Now.ToLongDateString() %> ******/
+IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id(N'<%= this.TableOwner %>[<%= this.ValidatePrefix %><%= this.EntityName %><%= this.ValidateSuffix %>]') AND OBJECTPROPERTY(id, N'IsProcedure') = 1)
+DROP PROCEDURE <%= this.TableOwner %>[<%= this.ValidatePrefix %><%= this.EntityName %><%= this.ValidateSuffix %>]
+GO
+
+	<%
+		}
+	%>
+	
+	<%-- INCLUDE RETRIEVEPAGINGLIST? --%>
+	<%
+		if (this.IncludeRetrievePagingList)
+		{
+	%>
+/****** Object:  Stored Procedure <%= this.TableOwner %>[<%= this.RetrievePagingListPrefix %><%= this.EntityName %><%= this.RetrievePagingListSuffix %>]    Script Date: <%= DateTime.Now.ToLongDateString() %> ******/
+IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id(N'<%= this.TableOwner %>[<%= this.RetrievePagingListPrefix %><%= this.EntityName %><%= this.RetrievePagingListSuffix %>]') AND OBJECTPROPERTY(id, N'IsProcedure') = 1)
+DROP PROCEDURE <%= this.TableOwner %>[<%= this.RetrievePagingListPrefix %><%= this.EntityName %><%= this.RetrievePagingListSuffix %>]
+GO
+
+	<%
+		}
+	%>
+	
+	<%-- INCLUDE RETRIEVEPAGINGROWCOUNT? --%>
+	<%
+		if (this.IncludeRetrievePagingRowCount)
+		{
+	%>
+/****** Object:  Stored Procedure <%= this.TableOwner %>[<%= this.RetrievePagingRowCount %><%= this.EntityName %><%= this.RetrievePagingRowCountSuffix %>]    Script Date: <%= DateTime.Now.ToLongDateString() %> ******/
+IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id(N'<%= this.TableOwner %>[<%= this.RetrievePagingRowCount %><%= this.EntityName %><%= this.RetrievePagingRowCountSuffix %>]') AND OBJECTPROPERTY(id, N'IsProcedure') = 1)
+DROP PROCEDURE <%= this.TableOwner %>[<%= this.RetrievePagingRowCount %><%= this.EntityName %><%= this.RetrievePagingRowCountSuffix %>]
+GO
+
+	<%
+		}
+	%>
+	
+<%
+	}
+%>
+
+
+<%-- INCLUDE CREATE? --%>
+<%
+	if (IncludeCreate)
+	{
+%>
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+---------------------------------------------------------------------------------------------------------------
+-- Date Created	: <%= DateTime.Now.ToLongDateString() %>
+-- Created By	: <%=Author%> by using CodeSmith v 2.6
+---------------------------------------------------------------------------------------------------------------
+
+CREATE PROCEDURE <%= this.TableOwner %><%= this.CreatePrefix %><%= this.EntityName %><%= this.CreateSuffix %>
+	<%-- PARAMETER DECLARATION --%>
+	<%
+		foreach (ColumnSchema objColumn in this.SourceTable.Columns)
+		{
+	%>
+	<%= this.GetSqlParameterDeclaration(objColumn) %><% if (this.SourceTable.Columns.IndexOf(objColumn) != this.SourceTable.Columns.Count - 1) %>,
+	<%
+		}
+	%>
+AS
+
+	<%-- UNIQUE IDENTIFIER --%>
+	<%
+		foreach (ColumnSchema objColumn in this.SourceTable.PrimaryKey.MemberColumns)
+		{
+			%> 
+	
+			<%
+			if (
+				(bool)objColumn.ExtendedProperties["CS_IsRowGuidCol"].Value &&
+				objColumn.ExtendedProperties["CS_Default"] != null)
+			{
+	%>
+		SET @<%= objColumn.Name %> = <%= objColumn.ExtendedProperties["CS_Default"].Value %>
+	<%
+			}
+		}
+	%>
+
+<%-- SQL STATEMENT --%>
+INSERT	INTO	<%= this.TableOwner %>[<%= this.SourceTable.Name %>]
+(
+	<%
+		foreach (ColumnSchema objColumn in this.SourceTable.Columns)
+		{
+			if ( !(bool)objColumn.ExtendedProperties["CS_IsIdentity"].Value )
+			{
+	%>
+	<%= objColumn.Name %><% if (this.SourceTable.Columns.IndexOf(objColumn) != this.SourceTable.Columns.Count -1) %>,
+	<%
+			}
+		}
+	%>
+)
+VALUES
+(
+	<%
+		foreach (ColumnSchema objColumn in this.SourceTable.Columns)
+		{
+			if (!(bool)objColumn.ExtendedProperties["CS_IsIdentity"].Value)
+			{
+	%>
+	@<%= objColumn.Name %><% if (this.SourceTable.Columns.IndexOf(objColumn) != this.SourceTable.Columns.Count - 1) %>,
+	<%
+			}
+		}
+	%>
+)
+
+	<%-- IDENTITY SET --%>
+	<%
+		foreach (ColumnSchema objColumn in this.SourceTable.PrimaryKey.MemberColumns)
+		{
+			if (
+				(bool)objColumn.ExtendedProperties["CS_IsIdentity"].Value)
+			{
+	%>
+SET @<%= objColumn.Name %> = @@IDENTITY
+	<%
+			}
+		}
+	%>
+
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+<%
+	}
+%>
+
+<%-- INCLUDE RETRIEVE? --%>
+<%
+	if (IncludeRetrieve)
+	{
+%>
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+---------------------------------------------------------------------------------------------------------------
+-- Date Created	: <%= DateTime.Now.ToLongDateString() %>
+-- Created By	: <%=Author%> by using CodeSmith v 2.6
+---------------------------------------------------------------------------------------------------------------
+
+CREATE PROCEDURE <%= this.TableOwner %><%= this.RetrievePrefix %><%= this.EntityName %><%= this.RetrieveSuffix %>
+	<%-- PARAMETER DECLARATION --%>
+	<%
+		foreach (ColumnSchema objColumn in this.SourceTable.PrimaryKey.MemberColumns)
+		{
+	%>
+	<%= this.GetSqlParameterDeclaration(objColumn) %><% if (this.SourceTable.PrimaryKey.MemberColumns.IndexOf(objColumn) != this.SourceTable.PrimaryKey.MemberColumns.Count - 1) %>,
+	<%
+		}
+	%>
+AS
+
+<%-- ISOLATION LEVEL --%>
+<%= this.TransactionIsolationLevel %>
+
+<%-- SQL STATEMENT --%>
+SELECT
+	<%
+		foreach (ColumnSchema objColumn in this.SourceTable.Columns)
+		{
+	%>
+	[<%= objColumn.Name %>]<% if (this.SourceTable.Columns.IndexOf(objColumn) != this.SourceTable.Columns.Count - 1) %>,
+	<%
+		}
+	%>
+FROM	<%= this.TableOwner %>[<%= this.SourceTable.Name %>]
+WHERE
+	<%
+		foreach (ColumnSchema objColumn in this.SourceTable.PrimaryKey.MemberColumns)
+		{
+	%>
+		<%
+			if (this.SourceTable.Columns.IndexOf(objColumn) == 0)
+			{
+		%>
+	[<%= objColumn.Name %>] = @<%= objColumn.Name %>
+		<%
+			}
+			else
+			{
+		%>
+AND	[<%= objColumn.Name %>] = @<%= objColumn.Name %>
+		<%
+			}
+		%>
+	<%
+		}
+	%>
+
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+<%
+	}
+%>
+
+<%-- INCLUDE RETRIEVELIST? --%>
+<%
+	if (IncludeRetrieveList)
+	{
+%>
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+---------------------------------------------------------------------------------------------------------------
+-- Date Created	: <%= DateTime.Now.ToLongDateString() %>
+-- Created By	: <%=Author%> by using CodeSmith v 2.6
+---------------------------------------------------------------------------------------------------------------
+
+CREATE PROCEDURE <%= this.TableOwner %><%= this.RetrieveListPrefix %><%= this.EntityName %><%= this.RetrieveListSuffix %>
+AS
+
+<%-- ISOLATION LEVEL --%>
+<%= this.TransactionIsolationLevel %>
+
+<%-- SQL STATEMENT --%>
+SELECT
+	<%
+		foreach (ColumnSchema objColumn in this.SourceTable.Columns)
+		{
+	%>
+	[<%= objColumn.Name %>]<% if (this.SourceTable.Columns.IndexOf(objColumn) != this.SourceTable.Columns.Count - 1) %>,
+	<%
+		}
+	%>
+FROM	<%= this.TableOwner %>[<%= this.SourceTable.Name %>]
+
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+<%
+	}
+%>
+
+
+<%-- NINO 2015.02.05 tambah retrive by condition utk devexpress yg gk perlu paging --%>
+
+<%-- INCLUDE RETRIEVEWITHCONDITION? --%>
+<%
+	if (IncludeRetrieveWithCondition)
+	{
+%>
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+---------------------------------------------------------------------------------------------------------------
+-- Date Created	: <%= DateTime.Now.ToLongDateString() %>
+-- Created By	: <%=Author%> by using CodeSmith v 2.6
+---------------------------------------------------------------------------------------------------------------
+
+CREATE PROCEDURE <%= this.TableOwner %><%= this.RetrieveWithConditionPrefix %><%= this.EntityName %><%= this.RetrieveWithConditionSuffix %>
+	@SearchCondition AS NVARCHAR(4000) = '1=1',
+	@OrderBy AS NVARCHAR(200)
+AS
+
+<%-- ISOLATION LEVEL --%>
+<%= this.TransactionIsolationLevel %>
+
+<%-- SQL STATEMENT --%>
+IF @SearchCondition = ''
+	SET @SearchCondition = '1=1'
+	
+DECLARE		@Cmd 	NVARCHAR(4000)
+
+SET @Cmd = '
+
+SELECT
+	<%
+		foreach (ColumnSchema objColumn in this.SourceTable.Columns)
+		{
+	%>
+	[<%= objColumn.Name %>]<% if (this.SourceTable.Columns.IndexOf(objColumn) != this.SourceTable.Columns.Count - 1) %>,
+	<%
+		}
+	%> 
+FROM	<%= this.TableOwner %>[<%= this.SourceTable.Name %>]
+WHERE ' + @SearchCondition + '
+ORDER BY ' + @OrderBy
+
+EXEC (@Cmd)
+
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+<%
+	}
+%>
+
+
+
+
+
+<%-- INCLUDE RETRIEVEPAGINGLIST? --%>
+<%
+	if (IncludeRetrievePagingList)
+	{
+%>
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+---------------------------------------------------------------------------------------------------------------
+-- Date Created	: <%= DateTime.Now.ToLongDateString() %>
+-- Created By	: <%=Author%> by using CodeSmith v 2.6
+---------------------------------------------------------------------------------------------------------------
+
+CREATE PROCEDURE <%= this.TableOwner %><%= this.RetrievePagingListPrefix %><%= this.EntityName %><%= this.RetrievePagingListSuffix %>
+		@PageSize	INT
+		,@CurrentPage	INT
+		,@OrderBy	NVARCHAR(100)
+		,@Order		NVARCHAR(5)
+		,@RowCount  INT
+		,@SearchCondition AS NVARCHAR(4000) = '1=1'
+AS
+
+<%-- ISOLATION LEVEL --%>
+<%= this.TransactionIsolationLevel %>
+
+<%-- SQL STATEMENT --%>
+IF @SearchCondition = ''
+	SET @SearchCondition = '1=1'
+
+DECLARE		@CurrPageSize INT
+DECLARE		@Cmd 	NVARCHAR(4000)
+
+IF @PageSize >= @RowCount
+	SET @CurrPageSize = @RowCount
+ELSE
+IF @RowCount > (@PageSize * (@CurrentPage+1))
+	SET @CurrPageSize = @PageSize
+ELSE
+	IF @CurrentPage > 0
+		SET @CurrPageSize = @RowCount - (@PageSize * @CurrentPage)
+
+
+SET 		@Cmd = '
+SELECT		*
+FROM		(SELECT	TOP ' + CONVERT(NVARCHAR,@CurrPageSize) + ' *
+		 FROM 
+			(SELECT	TOP ' + CONVERT(NVARCHAR, @PageSize * (@CurrentPage+1)) + ' *
+			 FROM <%= this.TableOwner %>[<%= this.SourceTable.Name %>]
+			 WHERE ' + @SearchCondition + '
+			 ORDER BY ' + @OrderBy + ' ' + @Order + ' 
+			 )AS A
+		 ORDER BY ' + @OrderBy + CASE @Order WHEN 'ASC' THEN ' DESC ' ELSE ' ASC ' END + '
+		 )AS B
+ORDER BY	' + @OrderBy + ' ' + @Order
+
+EXEC (@Cmd)
+
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+<%
+	}
+%>
+
+
+<%-- INCLUDE RETRIEVEPAGINGROWCOUNT? --%>
+<%
+	if (IncludeRetrievePagingRowCount)
+	{
+%>
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+---------------------------------------------------------------------------------------------------------------
+-- Date Created	: <%= DateTime.Now.ToLongDateString() %>
+-- Created By	: <%=Author%> by using CodeSmith v 2.6
+---------------------------------------------------------------------------------------------------------------
+
+CREATE PROCEDURE <%= this.TableOwner %><%= this.RetrievePagingRowCount %><%= this.EntityName %><%= this.RetrievePagingRowCountSuffix %>
+		@SearchCondition AS NVARCHAR(4000) = '1=1'
+AS
+
+<%-- ISOLATION LEVEL --%>
+<%= this.TransactionIsolationLevel %>
+
+<%-- SQL STATEMENT --%>
+IF @SearchCondition = ''
+	SET @SearchCondition = '1=1'
+
+DECLARE		@Cmd 	NVARCHAR(4000)
+SET 		@Cmd = '
+SELECT	COUNT(*)
+FROM <%= this.TableOwner %>[<%= this.SourceTable.Name %>]
+WHERE ' + @SearchCondition 
+
+EXEC (@Cmd)
+
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+<%
+	}
+%>
+
+<%-- INCLUDE UPDATE? --%>
+<%
+	if (IncludeUpdate)
+	{
+%>
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+---------------------------------------------------------------------------------------------------------------
+-- Date Created	: <%= DateTime.Now.ToLongDateString() %>
+-- Created By	: <%=Author%> by using CodeSmith v 2.6
+---------------------------------------------------------------------------------------------------------------
+
+CREATE PROCEDURE <%= this.TableOwner %><%= this.UpdatePrefix %><%= this.EntityName %><%= this.UpdateSuffix %>
+	<%-- PARAMETER DECLARATION --%>
+	<%
+		int x = 0;
+		foreach (ColumnSchema objColumn in this.SourceTable.Columns)
+		{
+			if ((objColumn.Name != "DibuatOleh") && (objColumn.Name != "WaktuDibuat") ) {
+	%>
+	<% if ( x > 0) %>, <%= this.GetSqlParameterDeclaration(objColumn) %>
+	<%
+			x += 1;
+			}
+		}
+	%>
+	,@Old_WaktuDiubah DATETIME
+AS
+
+<%-- SQL STATEMENT --%>
+UPDATE	<%= this.TableOwner %>[<%= this.SourceTable.Name %>]
+SET
+	<%
+		int i = 0;
+		foreach (ColumnSchema objColumn in this.SourceTable.NonPrimaryKeyColumns)
+		{
+			if ((objColumn.Name != "DibuatOleh") && (objColumn.Name != "WaktuDibuat") ) {
+	%>
+	<% if (i > 0) {%>,<%} %> [<%= objColumn.Name %>] = @<%= objColumn.Name %>
+	<%
+		i += 1;
+			}
+		}
+	%>
+WHERE
+	<%
+		foreach (ColumnSchema objColumn in this.SourceTable.PrimaryKey.MemberColumns)
+		{
+	%>
+		<%
+			if (this.SourceTable.Columns.IndexOf(objColumn) == 0)
+			{
+		%>
+	[<%= objColumn.Name %>] = @<%= objColumn.Name %>
+		<%
+			}
+			else
+			{
+		%>
+AND	[<%= objColumn.Name %>] = @<%= objColumn.Name %>
+		<%
+			}
+		%>
+	<%
+		}
+	%>
+
+AND WaktuDiubah = @Old_WaktuDiubah
+
+IF @@ROWCOUNT = 0
+	EXEC ConcurrentModificationError
+	
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+<%
+	}
+%>
+
+<%-- INCLUDE DELETE? --%>
+<%
+	if (IncludeDelete)
+	{
+%>
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+---------------------------------------------------------------------------------------------------------------
+-- Date Created	: <%= DateTime.Now.ToLongDateString() %>
+-- Created By	: <%=Author%> by using CodeSmith v 2.6
+---------------------------------------------------------------------------------------------------------------
+
+CREATE PROCEDURE <%= this.TableOwner %><%= this.DeletePrefix %><%= this.EntityName %><%= this.DeleteSuffix %>
+	<%-- PARAMETER DECLARATION --%>
+
+	<%
+		foreach (ColumnSchema objColumn in this.SourceTable.PrimaryKey.MemberColumns)
+		{
+	%>
+	<%= this.GetSqlParameterDeclaration(objColumn) %><% if (this.SourceTable.PrimaryKey.MemberColumns.IndexOf(objColumn) != this.SourceTable.PrimaryKey.MemberColumns.Count - 1) %>,
+	<%
+		}
+	%>
+AS
+
+<%-- SQL STATEMENT --%>
+DELETE	<%= this.TableOwner %>[<%= this.SourceTable.Name %>]
+WHERE
+	<%
+		foreach (ColumnSchema objColumn in this.SourceTable.PrimaryKey.MemberColumns)
+		{
+	%>
+		<%
+			if (this.SourceTable.Columns.IndexOf(objColumn) == 0)
+			{
+		%>
+	[<%= objColumn.Name %>] = @<%= objColumn.Name %>
+		<%
+			}
+			else
+			{
+		%>
+AND	[<%= objColumn.Name %>] = @<%= objColumn.Name %>
+		<%
+			}
+		%>
+	<%
+		}
+	%>
+
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+<%
+	}
+%>
+
+<%-- INCLUDE VALIDATE? --%>
+<%
+	if (IncludeValidate)
+	{
+%>
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+---------------------------------------------------------------------------------------------------------------
+-- Date Created	: <%= DateTime.Now.ToLongDateString() %>
+-- Created By	: <%=Author%> by using CodeSmith v 2.6
+---------------------------------------------------------------------------------------------------------------
+
+CREATE PROCEDURE <%= this.TableOwner %><%= this.ValidatePrefix %><%= this.EntityName %><%= this.ValidateSuffix %>
+	<%-- PARAMETER DECLARATION --%>
+	@Result	varchar(1000),
+	<%
+		foreach (ColumnSchema objColumn in this.SourceTable.Columns)
+		{
+	%>
+	<%= this.GetSqlParameterDeclaration(objColumn) %><% if (this.SourceTable.Columns.IndexOf(objColumn) != this.SourceTable.Columns.Count - 1) %>,
+	<%
+		}
+	%>
+AS
+
+<%-- SQL STATEMENT --%>
+SET	@Result = ''
+
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+<%
+	}
+%>
+
+<script runat="template">
+[Browsable(false)]
+public string TableOwner
+{
+	get
+	{
+		if (this.SourceTable.Owner.Length > 0)
+		{
+			return "[" + this.SourceTable.Owner + "].";
+		}
+		else
+		{
+			return "";
+		}
+	}
+}
+
+[Browsable(false)]
+public string EntityName
+{
+	get
+	{
+		if (this.SourceTable.Name.ToLower().EndsWith("s") && this.RemoveSuffix_S)
+		{
+			string text = (this.SourceTable.Name).Replace(" ","");
+			return text.Substring(0, text.Length - 1);			
+		}
+		else
+		{
+			return this.SourceTable.Name.Replace(" ","");
+		}
+	}
+}
+
+public string GetSqlParameterDeclaration (ColumnSchema column)
+{
+	string strParamDeclaration = "@" + column.Name + " " + column.NativeType.ToString();
+
+	switch (column.NativeType)
+	{
+		case "char":
+		case "nchar":
+		case "nvarchar":
+		case "sysname":
+		case "text":
+		case "varchar":
+			strParamDeclaration += "(" + column.Size.ToString() + ")";
+			break;
+
+		case "decimal":
+			strParamDeclaration += "(" + column.Size.ToString() + ", " + column.Precision.ToString() + ")";
+			break;
+
+		case "numeric":
+			strParamDeclaration += "(" + column.Precision.ToString() + ", " + column.Scale.ToString() + ")";
+			break;
+			
+		case "ntext":
+		case "bigint":
+		case "binary":
+		case "bit":
+		case "datetime":
+		case "smalldatetime":
+		case "money":
+		case "float":
+		case "image":
+		case "int":
+		case "tinyint":
+		
+			
+		case "real":
+		case "smallint":
+		case "smallmoney":
+		case "sql_variant":
+		case "timestamp":
+		case "uniqueidentifier":
+		case "varbinary":
+		default:
+			break;
+	}
+
+/*
+	if (column.IsPrimaryKeyMember)
+	{
+		strParamDeclaration += " OUTPUT";
+	}
+	
+*/
+
+	return strParamDeclaration;
+}
+
+public enum TransactionIsolationLevelEnum
+{
+	ReadCommitted,
+	ReadUncommitted,
+	RepeatableRead,
+	Serializable
+}
+
+[Browsable(false)]
+public string TransactionIsolationLevel
+{
+	get
+	{
+		switch (this.IsolationLevel)
+		{
+			case TransactionIsolationLevelEnum.ReadCommitted:
+			{
+				return "SET TRANSACTION ISOLATION LEVEL READ COMMITTED";
+			}
+			case TransactionIsolationLevelEnum.ReadUncommitted:
+			{
+				return "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED";
+			}
+			case TransactionIsolationLevelEnum.RepeatableRead:
+			{
+				return "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ";
+			}
+			case TransactionIsolationLevelEnum.Serializable:
+			{
+				return "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE";
+			}
+			default:
+				return "SET TRANSACTION ISOLATION LEVEL READ COMMITTED";
+		}
+	}
+}
+</script>

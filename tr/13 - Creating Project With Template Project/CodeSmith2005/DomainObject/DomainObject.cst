@@ -1,0 +1,281 @@
+<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="" Inherits="" Debug="False" Description="Template description here." %>
+
+<%@ Property Name="SourceTable" Type="SchemaExplorer.TableSchema" Optional="False" Category="Context" Description="Table that the object is based on." %>
+<%@ Property Name="Author"  Type="String"  Category="Summary"  Default="IMFI Development Team" Description="The name of the Creator class to generate" %>
+<%@ Property Name="ProjectName" Type="System.String" Category="Code" Default="SR" Description="Namespace of the project which shall contain this form" %>    
+<%@ Property Name="ModuleName" Type="System.String" Category="Code" Default="ModuleName" Description="Namespace of the project which shall contain this form" %>    
+<%@ Property Name="RemoveSuffix_S" Type="System.Boolean" Category="Code" Default="false" Description="Set either to remove Suffix S from table name or not." %>    
+
+<%@ Assembly Name="System.Data" %>
+<%@ Assembly Name="SchemaExplorer" %>
+
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="SchemaExplorer" %>
+
+
+#Region "Header Info"
+
+#Region "Code Disclaimer"
+
+'************************************************************
+'*															*
+'*	             Copyright © 2006 IMFI                      *
+'*															*
+'************************************************************
+
+#End Region
+
+#Region "Summary"
+
+'************************************************************
+'*															*
+'*   Author      : <%=Author%>		                        *
+'*   Purpose     : <%= GetClassName(SourceTable) + " Domain Object."%>              *
+'*   Called By   :                                          *
+'*															*
+'************************************************************
+
+#End Region
+
+#Region "History"
+
+'************************************************************
+'*															*
+'*   Created On  : <%= DateTime.Now.ToShortDateString() %> - <%= DateTime.Now.ToLongTimeString() %>    *
+'*															*
+'*   Modify By   : {Name} - {Date}                           *
+'*       - {Description Here}                                *
+'*															*
+'************************************************************/
+
+#End Region
+
+#End Region
+
+#Region "Namespace Imports"
+
+#Region ".NET Base Class Namespace Imports"
+
+Imports System
+
+#End Region
+
+#Region "Custom Namespace Imports"
+
+Imports IMFI.Framework.Persistance.DomainObjects
+
+#End Region
+
+#End Region
+
+namespace IMFI.<%= ProjectName %>.DomainObjects<% if (ModuleName != "") { %>.<%= ModuleName%> <%}%>
+	<Serializable> _
+	Public class <%= GetClassName(SourceTable)%>
+		Inherits AbstractDomainObject
+		
+		#region "Constructors/Destructors/Finalizers"
+		Public Sub New()
+		End Sub
+		
+		
+		Public Sub New(<%=GetPrimaryKeyColumnParameterDeclaration(SourceTable)%>)
+		
+			<% foreach(ColumnSchema column in SourceTable.PrimaryKey.MemberColumns)	{ %>
+			<%=	GetMemberVariableName(column) + " = " + GetPropertyName(column) %>
+			<%}%>
+		end sub
+		#End Region
+		
+		#region "Private Variables"
+		<% for (int i = 0; i < SourceTable.Columns.Count; i++) { %>       
+		<%= GetMemberVariableDeclarationStatement(SourceTable.Columns[i]) %>		
+		<% } %>
+		#End Region
+		
+		#region "Public Properties"
+		<% for (int i = 0; i < SourceTable.Columns.Count; i++) { %>       
+		Public Property <%= GetPropertyName(SourceTable.Columns[i]) %> as <%= GetCSharpVariableType(SourceTable.Columns[i]) %>
+			Get 
+				return <%= GetMemberVariableName(SourceTable.Columns[i]) %>
+			End Get
+			Set 
+				<%= GetMemberVariableName(SourceTable.Columns[i]) %> = value
+			End Set
+		End Property
+		
+		<% if (i < SourceTable.Columns.Count - 1) Response.Write("\r\n"); %>
+		<% } %>				
+		#End Region
+	End Class
+End Namespace
+
+<script runat="template">
+public string GetClassName(TableSchema table)
+{
+	if (table.Name.EndsWith("s") && RemoveSuffix_S)
+	{
+		return table.Name.Substring(0, table.Name.Length - 1).Replace(" ","");
+	}
+	else
+	{
+		return table.Name.Replace(" ","");
+	}
+}
+
+public string GetMemberVariableDeclarationStatement(ColumnSchema column)
+{
+	return GetMemberVariableDeclarationStatement("private", column);
+}
+
+public string GetMemberVariableDeclarationStatement(string protectionLevel, ColumnSchema column)
+{
+	string statement = protectionLevel + " ";
+	statement += GetMemberVariableName(column) + " as " + GetCSharpVariableType(column);
+	
+	string defaultValue = GetMemberVariableDefaultValue(column);
+	if (defaultValue != "")
+	{
+		statement += " = " + defaultValue;
+	}
+	
+	return statement;
+}
+
+public string GetMemberVariableDefaultValue(ColumnSchema column)
+{
+	switch (column.DataType)
+	{
+		case DbType.Guid:
+		{
+			return "Guid.Empty";
+		}
+		case DbType.AnsiString:
+		case DbType.AnsiStringFixedLength:
+		case DbType.String:
+		case DbType.StringFixedLength:
+		{
+			return "String.Empty";
+		}
+		case DbType.Date:
+		case DbType.DateTime:
+		{
+			return "CType(System.Data.SqlTypes.SqlDateTime.MinValue.Value,DateTime)";
+		}
+		default:
+		{
+			return "";
+		}
+	}
+}
+
+public string GetCSharpVariableType(ColumnSchema column)
+{
+	//if (column.Name.EndsWith("TypeCode")) return column.Name;
+	
+	switch (column.DataType)
+	{
+		case DbType.AnsiString: return "string";
+		case DbType.AnsiStringFixedLength: return "string";
+		case DbType.Binary: return "byte()";
+		case DbType.Boolean: return "boolean";
+		case DbType.Byte: return "byte";
+		case DbType.Currency: return "decimal";
+		case DbType.Date: return "DateTime";
+		case DbType.DateTime: return "DateTime";
+		case DbType.Decimal: return "decimal";
+		case DbType.Double: return "double";
+		case DbType.Guid: return "Guid";
+		case DbType.Int16: return "short";
+		case DbType.Int32: return "int32";
+		case DbType.Int64: return "long";
+		case DbType.Object: return "object";
+		case DbType.SByte: return "sbyte";
+		case DbType.Single: return "float";
+		case DbType.String: return "string";
+		case DbType.StringFixedLength: return "string";
+		case DbType.Time: return "TimeSpan";
+		case DbType.UInt16: return "ushort";
+		case DbType.UInt32: return "uint";
+		case DbType.UInt64: return "ulong";
+		case DbType.VarNumeric: return "decimal";
+		default:
+		{
+			return "__UNKNOWN__" + column.NativeType;
+		}
+	}
+}
+
+public string GetVBVariableType(ColumnSchema column)
+{
+	//if (column.Name.EndsWith("TypeCode")) return column.Name;
+	
+	switch (column.DataType)
+	{
+		case DbType.AnsiString: return "string";
+		case DbType.AnsiStringFixedLength: return "string";
+		case DbType.Binary: return "byte()";
+		case DbType.Boolean: return "boolea";
+		case DbType.Byte: return "byte";
+		case DbType.Currency: return "decimal";
+		case DbType.Date: return "DateTime";
+		case DbType.DateTime: return "DateTime";
+		case DbType.Decimal: return "decimal";
+		case DbType.Double: return "double";
+		case DbType.Guid: return "Guid";
+		case DbType.Int16: return "Int16";
+		case DbType.Int32: return "Int32";
+		case DbType.Int64: return "Int64";
+		case DbType.Object: return "object";
+		case DbType.SByte: return "sbyte";
+		case DbType.Single: return "float";
+		case DbType.String: return "string";
+		case DbType.StringFixedLength: return "string";
+		case DbType.Time: return "TimeSpan";
+		case DbType.UInt16: return "UInt16";
+		case DbType.UInt32: return "UInt32";
+		case DbType.UInt64: return "UInt64";
+		case DbType.VarNumeric: return "decimal";
+		default:
+		{
+			return "__UNKNOWN__" + column.NativeType;
+		}
+	}
+}
+
+public string GetMemberVariableName(ColumnSchema column)
+{
+	string PropertyName = GetPropertyName(column);
+	//string memberVariableName = "_" + GetCamelCaseName(PropertyName);
+	string memberVariableName = "_" + PropertyName;
+	
+	return memberVariableName;
+}
+
+public string GetPropertyName(ColumnSchema column)
+{
+	string PropertyName = column.Name;
+	
+	if (PropertyName.EndsWith("TypeCode")) PropertyName = PropertyName.Substring(0, PropertyName.Length - 4);
+	
+	return PropertyName.Replace(" ","");
+}
+
+public string GetCamelCaseName(string value)
+{
+	return value.Substring(0, 1).ToLower() + value.Substring(1);
+}
+
+public string GetPrimaryKeyColumnParameterDeclaration(TableSchema table)
+{
+	string strReturn = "";
+	foreach(ColumnSchema column in table.PrimaryKey.MemberColumns)
+	{
+		strReturn += (strReturn.Length == 0 ? "" : ", ");
+		strReturn += GetPropertyName(column);
+		strReturn += " AS ";
+		strReturn += GetVBVariableType(column) + " ";
+		
+	}
+	return strReturn;
+}
+</script>

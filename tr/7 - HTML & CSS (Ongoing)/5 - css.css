@@ -1,0 +1,21 @@
+body
+{
+	background-color:#E3F983;
+}
+
+h1
+{
+	color:#5D4A57;
+}
+
+#kotaktengah
+{	
+	position : absolute;
+	top : 100px;
+	left : 100px;
+	margin-left:100px;
+	padding-left: 20px;
+	width : 400px;
+	height : 400px;	
+	background-color : #ADE0E7;
+}

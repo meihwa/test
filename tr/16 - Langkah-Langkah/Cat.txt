@@ -1,0 +1,132 @@
+address :
+serweb 100.100.103.1 -> 192.192.10.28
+ga plus/pdf viewer 100.100.88.18 -> 192.192.10.98
+
+masalah lain :
+- email
+- gk bs print
+- gk bs share folder
+dll yg gk hub sm it dev, lempar ke hd or infra
+
+petty cash
+- unsubmit
+- transfer gl gagal -> gk py description
+  -> ada sumdok yg gk py transaksi (pencairan)
+	cek sumdok di journal hdr
+	cek sumdok di pencairan hdr
+	klo gk ada pencairan hdr nya, delete sumdok journal hdr n dtl
+- submit, jurnal kosong
+  -> bugs,
+	diunsubmit, coba submit ulang
+- acc minta kita revise-in transaksi bkk
+  -> dibantuin aja yak
+  
+uang muka
+- unsubmit
+- submit, jurnal kosong
+  -> bugs,
+	diunsubmit, coba submit ulang
+
+bbm
+- cost center jurnal -> pemakai
+  -> ganti di master pemakai kendaraan, yg bs ganti bac sm si kacab
+- di klaim detil, tgl nya dobel -> efeknya gk bs submit mpp
+  -> apus yg dobel, atau edit
+  
+loan app -> catet, trus tanya okta
+
+transfer dana / e-transfer -> 100.100.0.28
+- user nyangkut
+  -> remote ke seracc
+  -> buka enterprise manager, buka database idmbltransfer
+  -> buka table MLogin, cr nama yg nyangkut, 
+	 ke field hostip dan hostname diapus isinya (bukan di-null)
+- print report eror
+  -> logout, login lg, coba print report lg
+- entry transfer dana gantung, biasa diemail dr treasury (desi / xenia)
+  -> biasa diemail ud dikasitw nomor register nya
+  -> cek table TrTransferH dan TrTransferD, filter by noreg
+  -> cr field StTransaksi, ubah menjadi 6 di kedua table tersebut
+  
+e-approval
+- login gagal
+  -> bs expired, bs salah password, klo nyerah, reset aja ke pswd alay ds
+- user gk dpt email notifikasi -> almost imposible
+  -> selama setting email user (master employee) bener, pasti kekirim
+  -> bs jg krn masuk ke junk email
+  -> user males nyari
+- user gk bs reply (balasan reply gk diterima oleh sistem)
+  -> keyword gk sesuai
+  -> email managernya selain outlook, outlook express, thunderbird
+  -> setting email di usernya salah, jd email gk kekirim kmn" 
+  -> minta hd/infra cek settingn email account
+- minta dibuatkan user baru (employee baru/kacab mutasi)
+  -> klo user pusat, pastikan jabatan
+	 staff -> cuti lembur ijin medical
+	 koor up -> cuti ijin medical
+  -> kacab mutasi
+	 -> cek nik kacab sblm dan sesudah, by branchcode di masteremployee
+	 -> klo ada yg sblmnya, berarti tinggal employee transfer
+	 -> utk ga inventaris, ga operasional, ptk admin, ao, kol, ladies
+	 -> klo gk ada berarti tambahkan manual di masing" tipe approval
+	 -> klo kacab sblmnya adalah kacab pjs, berarti nonaktifin kacab sblmnya
+	    di tiap tipe approval sekaligus tambahkan kacab barunya
+	 -> jgn lupa ganti email utk user approval scoring kacab 10000+kode cabang
+		
+Scoring
+- level 1 ud approve, level 2 msh new
+  -> scoringheader -> scoringdetillevel
+  -> level 2 update jd current (C)
+- level 2 approve, level 1 malah jd current
+  -> scoringheader -> scoringdetillevel
+  -> level 1 update jd current approve (A)
+- kacab gk dpt email
+  -> cek di masteremployee utk user dgn nik 10000+kode cabangnya, cek emailnya
+- ada jawaban yg gk kepilih dan gk bs dipilih 
+  -> ini berarti ada inputan di header yg salah
+- send need approval, nomor approval gk muncul
+  -> berarti approval ud ke create
+  -> hrs apus approval transaction, by field1 isinya nodataregister.nodatadetilscoringlevel  
+  
+Perubahan data
+- timeout
+  -> ke okta
+  
+GA Plus 
+- user nyangkut
+  -> ListUser, ganti FStatus jd 0
+- menu purchase request, ketika milih inventory gk muncul
+  -> inventorynya nyangkut di detail
+  -> apus trpurchasedetil yg noreg nya gk ada di trpurchase
+- generate sparepart n service
+  -> sp nya ada di alvin
+- klo minta tarik data, klo gk tw tablenya tanya nino
+- org GA mw edit transaksi yg periodenya ud close
+  -> buka table MstPeriod, sort desc, update fstatus periode dr yg plg baru smp periode yg dia pengen jd 0
+- misbahudin minta edit pemohon transaksi maintenance request
+  -> buka table trmaintenancerequest, edit pemohon pk nik yg dikasi dia
+  
+- closing
+  -> org acc akan minta backup 2x
+  1. backup sblm depre
+  2. backup sblm GL
+  
+  
+  
+  
+  
+  
+  
+		
+	 
+	 
+	 
+  
+
+  
+  
+  
+  
+
+
+

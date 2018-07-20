@@ -1,0 +1,43 @@
+body
+{
+	background-color:#E3F983;
+}
+
+h1
+{
+	color:#5D4A57;
+	font-SIZE:50px;
+}
+
+#kiri
+{
+	position : absolute;
+	top : 0;
+	left : 0;
+	width  : 20%;
+	height : 100%;	
+	background-color : #FFD980;
+}
+
+#kanan
+{
+	position : absolute;
+	top : 0;
+	left : 20%;
+	width : 80%;
+	height : 100%;	
+	background-color : #ADE0E7;
+	
+}
+
+table
+{
+	width : 200px;
+	border : solid 1px black;
+}
+
+td
+{
+	border : solid 1px red;
+
+}

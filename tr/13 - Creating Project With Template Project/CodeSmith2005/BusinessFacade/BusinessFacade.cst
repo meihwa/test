@@ -1,0 +1,149 @@
+<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="" Inherits="" Debug="False" Description="Template description here." %>
+
+<%@ Property Name="SourceTable" Type="SchemaExplorer.TableSchema" Optional="False" Category="Context" Description="Table that the object is based on." %>
+<%@ Property Name="Author"  Type="String"  Category="Summary"  Default="IMFI Development Team" Description="The name of the Creator class to generate" %>
+<%@ Property Name="ProjectName" Type="System.String" Category="Code" Default="SR" Description="Namespace of the project which shall contain this form" %>    
+<%@ Property Name="ModuleName" Type="System.String" Category="Code" Default="MODULE NAME" Description="Namespace of the project which shall contain this form" %>    
+<%@ Property Name="RemoveSuffix_S" Type="System.Boolean" Category="Code" Default="false" Description="Set either to remove Suffix S from table name or not." %>    
+
+<%@ Assembly Name="System.Data" %>
+<%@ Assembly Name="SchemaExplorer" %>
+
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="SchemaExplorer" %>
+
+
+#Region "Header Info"
+
+#Region "Code Disclaimer"
+
+'************************************************************
+'*															*
+'*	             Copyright © IMFI                      *
+'*															*
+'************************************************************
+
+#End Region
+
+#Region "Summary"
+
+'************************************************************
+'*															*
+'*   Author      : <%=Author%>		            *
+'*   Purpose     : <%= GetObjectName(SourceTable) + " Business Facade."%>                      *
+'*   Called By   :                                          *
+'*															*
+'************************************************************
+
+#End Region
+
+#Region "History"
+
+'************************************************************
+'*															*
+'*   Created On  : <%= DateTime.Now.ToShortDateString() %> - <%= DateTime.Now.ToLongTimeString() %>                   *
+'*															*
+'*   Modify By   : {Name} - {Date}                          *
+'*       - {Description Here}                               *
+'*															*
+'************************************************************/
+
+#End Region
+
+#End Region
+
+#Region "Namespace Imports"
+
+#Region ".NET Base Class Namespace Imports"
+
+Imports System
+Imports System.Collections
+
+#End Region
+
+#Region "Custom Namespace Imports"
+
+
+Imports IMFI.Framework.Persistance.Mapper
+Imports IMFI.Framework.Persistance.DomainObjects.Core
+Imports IMFI.Framework.Persistance.BusinessFacade
+Imports IMFI.<%= ProjectName %>.DomainObjects<% if (ModuleName != "") { %>.<%= ModuleName%> <%}%>
+
+#End Region
+
+#End Region
+
+
+
+namespace IMFI.<%= ProjectName %>.BusinessFacade<% if (ModuleName != "") { %>.<%= ModuleName%> <%}%>
+
+	public class <%= GetClassName(SourceTable)%>
+		#region "Private Variables"
+		
+		private <%= GetObjectName(SourceTable)%>Mapper as IMapper
+		Private _Transaction As IDbTransaction
+		
+		#End Region
+		
+		#region "Constructors/Destructors/Finalizers"
+		
+		public Sub New()
+		
+			<%= GetObjectName(SourceTable)%>Mapper = MapperFactory.GetInstance().GetMapper(GetType(<%= GetObjectName(SourceTable)%>).ToString())
+		End Sub
+		#End Region
+		
+		#region "Public Methods"
+		
+		public Function Retrieve(ByVal oObjectTransporter as IObjectTransporter) as <%= GetObjectName(SourceTable)%> 
+			return CType(<%= GetObjectName(SourceTable)%>Mapper.Retrieve(oObjectTransporter), <%= GetObjectName(SourceTable)%>)
+		End Function
+
+		public Function  RetrieveListPaging(ByVal PageSize As Int32, ByVal CurrentPage As Int32, ByVal OrderBy As String, ByVal oObjectTransporter as IObjectTransporter, ByVal SearchCondition As String, ByRef RowCount As Int32) As ArrayList 
+			return <%= GetObjectName(SourceTable)%>Mapper.RetrieveListPaging(PageSize, CurrentPage, OrderBy, oObjectTransporter, SearchCondition, RowCount)
+		End Function
+
+
+		public Function RetrieveList(byVal oObjectTransporter as IObjectTransporter) as ArrayList
+			return <%= GetObjectName(SourceTable)%>Mapper.RetrieveList(oObjectTransporter)
+		End Function
+
+		public Function Create(byVal oObjectTransporter as IObjectTransporter) as Object
+			return <%= GetObjectName(SourceTable)%>Mapper.Insert(oObjectTransporter)
+		End Function
+		
+		public Function Delete(ByVal oObjectTransporter as IObjectTransporter) as Int32
+			return <%= GetObjectName(SourceTable)%>Mapper.Delete(oObjectTransporter)
+		End Function
+		
+		public Function Update(ByVal oObjectTransporter as IObjectTransporter ) as Int32
+			return <%= GetObjectName(SourceTable)%>Mapper.Update(oObjectTransporter)
+		End Function
+		
+		public Sub UseTransaction(ByVal oTransaction as IDbTransaction )
+		    <%= GetObjectName(SourceTable)%>Mapper.UseTransaction(oTransaction)
+			_Transaction = oTransaction        			
+		End Sub
+		
+		#End Region		
+	End Class
+End Namespace
+
+<script runat="template">
+public string GetClassName(TableSchema table)
+{
+	return GetObjectName(table) + "BusinessFacade";	
+}
+
+public string GetObjectName(TableSchema table)
+{
+	if (table.Name.EndsWith("s") && RemoveSuffix_S)
+	{
+		return table.Name.Substring(0, table.Name.Length - 1).Replace(" ","");
+	}
+	else
+	{
+		return table.Name.Replace(" ","");
+	}
+}
+</script>

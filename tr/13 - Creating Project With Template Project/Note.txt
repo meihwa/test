@@ -1,0 +1,66 @@
+Copy Folder Template CodeSmith2005, bebas dicopy kmn aja, sebaiknya jd 1 sm folder projects spy gk jauh"
+Copy Folder TemplateProject2010, ke C:\Documents and Settings\kresno\My Documents\Visual Studio 2010\Templates\ProjectTemplates
+
+CodeSmith Settings :
+Name : samakan dgn nama database
+ProviderType : SqlSchemaProvider
+Connection String utk di server : Data Source=100.100.100.88\dbdev;Initial Catalog=bookstore;Connection Timeout=1;user=sa;password=1t21imfi; 
+Connection String utk di local : Data Source=it-10;Initial Catalog=bookstore;Connection Timeout=1;Integrated Security=true; 
+ganti data source dgn nama server local masing masing
+
+Create Project dgn Template Project
+Urutan :
+DomainObjects
+Common
+DataMapper
+SPService
+ReportService
+BusinessFacade
+
+
+Setelah itu klik kanan, properties di tiap project, hapus root namespace dan ubah nama assembly :
+DomainObjects
+Common
+DataMapper
+BusinessFacade
+
+klik kanan, properties di tiap project, pilih reference, cek reference yg blm tepat
+klik ctrl+shift+h, replace IMFI.Template. dengan IMFI.BC.
+klik kanan di project presentation.web, set as start up project
+klik kanan di login.aspx, set as start up page
+cek apakah msh ada error, jika masih silahkan hub org terdekat.. :D
+jika ud gk ada, mulai generate dgn codesmith
+
+urutan generate :
+	sblm generate storedprocedure, generate sp concurrent_modification_error
+storedprocedure
+domainobjects
+datamapper -> menggunakan template datamapper2
+businessfacade
+
+cek apakah msh ada error..
+
+bikin hak akses
+
+web config
+<add name="DBSecurity" connectionString="Database=applicationsecurity;Server=dbweb2;Integrated Security=False;Password=1t21imfi;UID=sa;" providerName="System.Data.SqlClient"/>
+<add name="DBData" connectionString="Database=BookStore;Server=100.100.100.88\dbdev;Integrated Security=False;Password=1t21imfi;UID=sa;" providerName="System.Data.SqlClient" />
+
+ganti prefix group id dan prefix prog id dgn inisial project
+
+isi domaindatamap.xml
+
+bikin screen group id
+
+bikin UI
+
+bikin code behind
+
+bikin query string const
+
+create, update, delete, retrieve
+(New namaBF).function(new objectransporter(namaClass, (new useridentification).getusercredential))
+
+retrieve list paging
+(New namaBF).function(pagesize, currentpage, order by, new objectransporter(namaClass, (new useridentification).getusercredential),searchcondition,rowcount)
+

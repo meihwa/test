@@ -1,0 +1,50 @@
+? How To Import Excel Employee
+
+? Buka file excel ? Hapus baris pertama yang kosong (Pastikan nama kolom terletak paling atas)
+
+? Buka Microsoft SQL Server Management Studio:
+- dbweb2
+- Klik kanan di database EIS_HRD ? Tasks ? Import Data... ? Klik Next
+- Pilih Data Source: Microsoft Excel ? Klik Browse... ? Pilih file excel-nya ? Open ? Klik Next
+- Pilih "SQL Server Authentication" ? Masukkan username: sa & password: ?????? ? Klik Next
+- Ganti "$" di destination dengan tanggal
+- Klik Edit, cek type [Emp ID], ubah menjadi VARCHAR(8)
+- Klik Next ? Klik Finish
+
+? Table yang baru diimport
+- Modify ? Insert Column ? Nama: ID, Type: INT, NOT NULL, IS IDENTITY: YES (Primary Key)
+- New Query
+
+? Cek apakah ada data yang double.
+  Jika ada, hapus yang ID-nya paling kecil
+
+SELECT *
+FROM NewImportedTable emp
+WHERE emp.[Emp ID] IN
+(
+	SELECT emp.[Emp ID]
+	FROM NewImportedTable emp
+	GROUP BY emp.[Emp ID]
+	HAVING COUNT (emp.[Emp ID]) > 1
+)
+
+Untuk menghapus bisa menggunakan query:
+
+DELETE FROM Rpt_IMFI_HR_PA_All_Employee20151028
+WHERE ID IN
+(
+	SELECT MIN(ID)
+	FROM Rpt_IMFI_HR_PA_All_Employee20151028 emp
+	WHERE emp.[Emp ID] IN
+	(
+		SELECT emp.[Emp ID]
+		FROM Rpt_IMFI_HR_PA_All_Employee20151028 emp
+		GROUP BY emp.[Emp ID]
+		HAVING COUNT (emp.[Emp ID]) > 1
+	)
+	GROUP BY [Emp ID]
+)
+
+? Buka Stored Procedures "ImportEmpFromExcel"
+- Ganti nama table-nya
+- Jalankan Stored Procedures "ImportEmpFromExcel" TANPA ALTER, hanya dari DELETE sampai terakhir

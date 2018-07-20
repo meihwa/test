@@ -1,0 +1,406 @@
+<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="" Inherits="" Debug="False" Description="Template description here." %>
+
+<%@ Property Name="SourceTable" Type="SchemaExplorer.TableSchema" Optional="False" Category="Context" Description="Table that the object is based on." %>
+<%@ Property Name="Author"  Type="String"  Category="Summary"  Default="IMFI Development Team" Description="The name of the Creator class to generate" %>
+<%@ Property Name="ProjectName" Type="System.String" Category="Code" Default="SR" Description="Namespace of the project which shall contain this form" %>    
+<%@ Property Name="ModuleName" Type="System.String" Category="Code" Default="MODULE NAME" Description="Namespace of the project which shall contain this form" %>    
+<%@ Property Name="RemoveSuffix_S" Type="System.Boolean" Category="Code" Default="false" Description="Set either to remove Suffix s from table name or not." %>    
+
+<%@ Assembly Name="System.Data" %>
+<%@ Assembly Name="SchemaExplorer" %>
+
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="SchemaExplorer" %>
+
+
+#Region "Header Info"
+
+#Region "Code Disclaimer"
+
+'************************************************************
+'*															*
+'*	             Copyright © 2006 IMFI                      *
+'*															*
+'************************************************************
+
+#End Region
+
+#Region "Summary"
+
+'************************************************************
+'*															*
+'*   Author      : <%=Author%>		            *
+'*   Purpose     : <%= GetObjectName(SourceTable) + " Objects Mapper."%>                      *
+'*   Called By   :                                          *
+'*															*
+'************************************************************
+
+#End Region
+
+#Region "History"
+
+'************************************************************
+'*															*
+'*   Created On  : <%= DateTime.Now.ToShortDateString() %> - <%= DateTime.Now.ToLongTimeString() %>                   *
+'*															*
+'*   Modify By   : {Name} - {Date}                          *
+'*       - {Description Here}                               *
+'*															*
+'************************************************************/
+
+#End Region
+
+#End Region
+
+#Region "Namespace Imports"
+
+#Region ".NET Base Class Namespace Imports"
+
+Imports System
+Imports System.Data
+Imports System.Collections
+
+#End Region
+
+#Region "Custom Namespace Imports"
+
+Imports Microsoft.Practices.EnterpriseLibrary.Data
+'Imports Microsoft.Practices.EnterpriseLibrary.ExceptionHandling
+'Imports Microsoft.Practices.EnterpriseLibrary.Logging
+
+Imports IMFI.Framework.Persistance.DomainObjects.Core
+Imports IMFI.Framework.Persistance.Mapper
+Imports IMFI.<%= ProjectName %>.DomainObjects<% if (ModuleName != "") { %>.<%= ModuleName%> <%}%>
+
+#End Region
+
+#End Region
+
+namespace IMFI.<%= ProjectName %>.DataMapper<% if (ModuleName != "") { %>.<%= ModuleName%> <%}%>
+	public class <%= GetClassName(SourceTable) %> 
+		Inherits AbstractMapper
+
+		#Region "Constructors/Destructors/Finalizers"
+		
+		Public Sub New()
+			Db = DatabaseFactory.CreateDatabase()
+		End Sub
+		
+		#End Region
+		
+		#Region "Private Variables"
+		
+		Private m_InsertStatement as string = "USP_<%=GetObjectName(SourceTable)%>Insert"
+		Private m_UpdateStatement as string = "USP_<%=GetObjectName(SourceTable)%>Update"
+		Private m_RetrieveStatement as string = "USP_<%=GetObjectName(SourceTable)%>Retrieve"
+		Private m_RetrieveListStatement as string = "USP_<%=GetObjectName(SourceTable)%>RetrieveList"
+		Private m_DeleteStatement as string = "USP_<%=GetObjectName(SourceTable)%>Delete"
+        Private m_RetrieveListPagingStatement As String = "USP_<%=GetObjectName(SourceTable)%>RetrievePagingList"
+        Private m_RetrieveListPagingRowCountStatement As String = "USP_<%=GetObjectName(SourceTable)%>RetrievePagingRowCount"
+		
+		#End Region
+		
+		#Region "Protected Methods"
+		
+		Protected Overrides Function GetNewID(ByVal oDBCommandWrapper As System.Data.Common.DbCommand) as Object
+			return Db.GetParameterValue(DBCommand,"@<%= SourceTable.PrimaryKey.MemberColumns[0].Name %>")
+		End Function
+		
+		Protected Overrides Function GetInsertParameter(ByVal oObjectTransporter as IObjectTransporter) As System.Data.Common.DbCommand
+			
+			Dim oUserCredential As IUserCredential = CType(oObjectTransporter, IObjectTransporter).UserCredential
+            Dim <%=GetCamelCaseName(GetObjectName(SourceTable))%> as <%= GetObjectName(SourceTable)%>   = CType(CType(oObjectTransporter,IObjectTransporter).DomainObject, <%= GetObjectName(SourceTable) %>)
+			
+			DBCommand = Db.GetStoredProcCommand(me.m_InsertStatement)
+			
+			<% bool blnIDAdded = false; %>
+			
+			<% foreach(ColumnSchema column in SourceTable.Columns) { 
+					if (column.Name != "IsDelete") {
+			if (column.Name == "DibuatOleh") {
+			%>
+			<%
+			}
+			else if (column.Name == "WaktuDibuat") {
+			%>
+			<%
+			}
+			else if (column.Name == "DiubahOleh") {
+			%>
+			<%
+			}
+			else if (column.Name == "WaktuDiubah") {
+			%>
+			<%
+			} else {%>
+			
+			<% if (column.DataType.ToString().ToUpper() == "DATETIME") { %>
+				Db.AddInParameter(DBCommand,"@<%=column.Name%>",DbType.<%=column.DataType.ToString()%>,IIf(<%=GetCamelCaseName(GetObjectName(SourceTable))%>.<%=column.Name%> > #1/1/1753#, <%=GetCamelCaseName(GetObjectName(SourceTable))%>.<%=column.Name%>, System.DBNull.Value))
+			<% } else { %>
+				Db.AddInParameter(DBCommand,"@<%=column.Name%>",DbType.<%=column.DataType.ToString()%>,<%=GetCamelCaseName(GetObjectName(SourceTable))%>.<%=column.Name%>)
+			<% } } } } %>
+						
+			Return DBCommand
+		End Function
+		
+		Protected overrides Function GetUpdateParameter(ByVal oObjectTransporter as IObjectTransporter) As System.Data.Common.DbCommand
+			Dim objUserCredential As IUserCredential = CType(oObjectTransporter, IObjectTransporter).UserCredential
+            Dim <%=GetCamelCaseName(GetObjectName(SourceTable))%> as <%= GetObjectName(SourceTable)%>   = CType(CType(oObjectTransporter,IObjectTransporter).DomainObject, <%= GetObjectName(SourceTable) %>)
+			
+			DBCommand = Db.GetStoredProcCommand(me.m_UpdateStatement)
+			<% foreach(ColumnSchema column in SourceTable.Columns) {
+			if (column.Name != "IsDelete") {	
+			if (column.Name == "DibuatOleh") {
+			%>
+			
+			<%
+			}
+			else if (column.Name == "WaktuDibuat") {
+			%>
+			
+			<%
+			}
+			else if (column.Name == "DiubahOleh") {
+			%>
+			<%
+			}
+			else if (column.Name == "WaktuDiubah") {
+			%>
+			<%
+			} else {%>
+			<% if (column.DataType.ToString().ToUpper() == "DATETIME") { %>
+				Db.AddInParameter(DBCommand,"@<%=column.Name%>",DbType.<%=column.DataType.ToString()%>,IIf(<%=GetCamelCaseName(GetObjectName(SourceTable))%>.<%=column.Name%> > #1/1/1753#, <%=GetCamelCaseName(GetObjectName(SourceTable))%>.<%=column.Name%>, System.DBNull.Value))
+			<% } else { %>
+				Db.AddInParameter(DBCommand,"@<%=column.Name%>",DbType.<%=column.DataType.ToString()%>,<%=GetCamelCaseName(GetObjectName(SourceTable))%>.<%=column.Name%>)
+			<% } } } } %>
+									
+			Return DBCommand
+		End Function
+		
+		Protected overrides Function GetRetrieveParameter(ByVal oObjectTransporter as IObjectTransporter) As System.Data.Common.DbCommand 
+			
+			Dim <%=GetCamelCaseName(GetObjectName(SourceTable))%> as <%= GetObjectName(SourceTable)%>
+			If Not IsNothing(oObjectTransporter) Then
+			   <%= GetCamelCaseName(GetObjectName(SourceTable))%> = CType(CType(oObjectTransporter,IObjectTransporter).DomainObject, <%= GetObjectName(SourceTable) %>)
+			End If
+			DBCommand = Db.GetStoredProcCommand(me.m_RetrieveStatement)
+						
+			<% foreach(ColumnSchema column in SourceTable.Columns) { 
+			if (column.IsPrimaryKeyMember ) { %>			
+			Db.AddInParameter(DBCommand,"@<%=column.Name%>",DbType.<%=column.DataType%>,<%=GetCamelCaseName(GetObjectName(SourceTable))%>.<%=column.Name%>)
+			<% } } %>
+			
+			Return DBCommand
+		End Function
+		
+		protected overrides Function GetRetrieveListParameter(ByVal oObjectTransporter as IObjectTransporter) As System.Data.Common.DbCommand
+			Dim <%=GetCamelCaseName(GetObjectName(SourceTable))%> as <%= GetObjectName(SourceTable)%>
+			If Not IsNothing(oObjectTransporter) Then
+			   <%= GetCamelCaseName(GetObjectName(SourceTable))%> = CType(CType(oObjectTransporter,IObjectTransporter).DomainObject, <%= GetObjectName(SourceTable) %>)
+			End If
+			DBCommand = Db.GetStoredProcCommand(me.m_RetrieveListStatement)
+			Return DBCommand
+		End Function
+		
+		protected overrides Function GetRetrieveListPagingParameter(ByVal PageSize As Integer, ByVal CurrentPage As Integer, ByVal OrderBy As String, ByVal oObjectTransporter As IObjectTransporter, ByVal SearchCondition As String) As System.Data.Common.DbCommand
+			Dim <%=GetCamelCaseName(GetObjectName(SourceTable))%> as <%= GetObjectName(SourceTable)%>
+			If Not IsNothing(oObjectTransporter) Then
+			   <%= GetCamelCaseName(GetObjectName(SourceTable))%> = CType(CType(oObjectTransporter,IObjectTransporter).DomainObject, <%= GetObjectName(SourceTable) %>)
+			End If
+			DBCommand = Db.GetStoredProcCommand(Me.m_RetrieveListPagingStatement)
+			
+			Db.AddInParameter(DBCommand,"@PageSize", DbType.Int32, PageSize)
+            Db.AddInParameter(DBCommand,"@CurrentPage", DbType.Int32, CurrentPage)
+            Db.AddInParameter(DBCommand,"@OrderBy", DbType.String, OrderBy.Split(" "c)(0))
+            Db.AddInParameter(DBCommand,"@Order", DbType.String, OrderBy.Split(" "c)(1))
+            Db.AddInParameter(DBCommand,"@SearchCondition", DbType.String, IIf(IsNothing(SearchCondition), "", SearchCondition))
+
+			Return DBCommand
+		End Function
+		
+		protected overrides Function GetRetrieveListPagingRowCountParameter(ByVal oObjectTransporter as IObjectTransporter, ByVal SearchCondition As String) As System.Data.Common.DbCommand
+			Dim <%=GetCamelCaseName(GetObjectName(SourceTable))%> as <%= GetObjectName(SourceTable)%>
+			If Not IsNothing(oObjectTransporter) Then
+			   <%= GetCamelCaseName(GetObjectName(SourceTable))%> = CType(CType(oObjectTransporter,IObjectTransporter).DomainObject, <%= GetObjectName(SourceTable) %>)
+			End If
+			DBCommand = Db.GetStoredProcCommand(Me.m_RetrieveListPagingRowCountStatement)
+			  
+			Db.AddInParameter(DBCommand,"@SearchCondition", DbType.String, IIf(IsNothing(SearchCondition), "", SearchCondition))
+			  
+			Return DBCommand
+		End Function
+		
+		protected overrides Function GetDeleteParameter(oObjectTransporter as IObjectTransporter) As System.Data.Common.DbCommand
+			Dim oUserCredential As IUserCredential = CType(oObjectTransporter, IObjectTransporter).UserCredential
+			Dim <%=GetCamelCaseName(GetObjectName(SourceTable))%> as <%= GetObjectName(SourceTable)%>   = CType(CType(oObjectTransporter,IObjectTransporter).DomainObject, <%= GetObjectName(SourceTable) %>)
+			DBCommand = Db.GetStoredProcCommand(me.m_DeleteStatement)
+			
+			
+			<% foreach(ColumnSchema column in SourceTable.Columns) 
+			
+			{if (column.IsPrimaryKeyMember) { %>			
+			Db.AddInParameter(DBCommand,"@<%=column.Name%>",DbType.<%=column.DataType%>,<%=GetCamelCaseName(GetObjectName(SourceTable))%>.<%=column.Name%>)
+				<%}
+				}%>			
+			Return DBCommand
+		End Function
+		
+		protected overrides function DoRetrieve(ByVal dr as IDataReader ) as object
+			Dim  <%=GetCamelCaseName(GetObjectName(SourceTable))%> as <%= GetObjectName(SourceTable)%>  = nothing
+			While(dr.Read())
+			
+				<%=GetCamelCaseName(GetObjectName(SourceTable))%> = me.CreateObject(dr)
+			End While
+			
+			return <%=GetCamelCaseName(GetObjectName(SourceTable))%>
+		End Function
+		
+		protected overrides function DoRetrieveList(ByVal dr as IDataReader) as ArrayList 
+			Dim <%=GetCamelCaseName(GetObjectName(SourceTable))%>List as ArrayList = new ArrayList()
+			While(dr.Read())
+			
+					Dim <%=GetCamelCaseName(GetObjectName(SourceTable))%> as <%=GetObjectName(SourceTable)%>  = me.CreateObject(dr)				
+					<%=GetCamelCaseName(GetObjectName(SourceTable))%>List.Add(<%=GetCamelCaseName(GetObjectName(SourceTable))%>)
+			End While
+				               
+			return <%=GetCamelCaseName(GetObjectName(SourceTable))%>List
+		End Function
+		
+		#End Region		
+		
+		#Region "Private Methods"
+		
+		private function CreateObject( ByVal dr as IDataReader) as <%=GetObjectName(SourceTable)%> 
+			Dim <%=GetCamelCaseName(GetObjectName(SourceTable))%> as <%=GetObjectName(SourceTable)%> = new <%=GetObjectName(SourceTable)%>()
+			
+			<% foreach(ColumnSchema column in SourceTable.Columns)	{ %>
+			<%= (column.IsPrimaryKeyMember ? "" : "if(Not dr.IsDBNull(dr.GetOrdinal(\"" + column.Name + "\"))) then ") + GetCamelCaseName(GetObjectName(SourceTable)) + "." + GetPropertyName(column) + " = " + GetDataReaderGetStatement(column) %>
+			<%}%>
+						
+			return <%=GetCamelCaseName(GetObjectName(SourceTable))%>
+		End Function
+		
+		#End Region
+	End Class
+End Namespace
+
+<script runat="template">
+public string GetClassName(TableSchema table)
+{
+	return GetObjectName(table) + "Mapper";	
+}
+
+public string GetObjectName(TableSchema table)
+{
+	if (table.Name.EndsWith("s") && RemoveSuffix_S)
+	{
+		return table.Name.Substring(0, table.Name.Length - 1).Replace(" ","");
+	}
+	else
+	{
+		return table.Name.Replace(" ","");
+	}
+}
+
+public string GetCamelCaseName(string value)
+{
+	//return (value.Substring(0, 1).ToLower() + value.Substring(1));
+	return "o" + value;
+}
+
+public string GetPropertyName(ColumnSchema column)
+{
+	string propertyName = column.Name;
+	
+	//if (propertyName == column.Table.Name + "Name") return "Name";
+	//if (propertyName == column.Table.Name + "Description") return "Description";
+	
+	if (propertyName.EndsWith("TypeCode")) propertyName = propertyName.Substring(0, propertyName.Length - 4);
+	
+	return propertyName.Replace(" ","");
+}
+
+public string GetDataReaderGetStatement(ColumnSchema column)
+{
+	switch (column.DataType)
+	{
+		case DbType.AnsiString: return @"dr(""" + column.Name + @""")" + ".ToString()";
+		case DbType.AnsiStringFixedLength: return @"dr(""" + column.Name + @""")" + ".ToString()";
+		case DbType.Binary: return   "CType(" + @"dr(""" + column.Name + @"""),byte())";
+		case DbType.Boolean: return  "CType(" + @"dr(""" + column.Name + @"""),boolean)";
+		case DbType.Byte: return  "CType(" + @"dr(""" + column.Name + @"""),byte)";
+		case DbType.Currency: return "CType(" + @"dr(""" + column.Name + @"""),decimal)";
+		case DbType.Date: return  "CType(" + @"dr(""" + column.Name + @"""),DateTime)";
+		case DbType.DateTime: return "CType(" + @"dr(""" + column.Name + @"""),DateTime)";
+		case DbType.Decimal: return "CType(" + @"dr(""" + column.Name + @"""),decimal)";
+		case DbType.Double: return "CType(" + @"dr(""" + column.Name + @"""),double)";
+		case DbType.Guid: return "CType(" + @"dr(""" + column.Name + @"""),Guid)";
+		case DbType.Int16: return "CType(" + @"dr(""" + column.Name + @"""),short)";
+		case DbType.Int32: return "CType(" + @"dr(""" + column.Name + @"""),int32)";
+		case DbType.Int64: return "CType(" + @"dr(""" + column.Name + @"""),long)";
+		case DbType.Object: return "CType(" + @"dr(""" + column.Name + @"""),object)";
+		case DbType.SByte: return "CType(" + @"dr(""" + column.Name + @"""),sbyte)";
+		case DbType.Single: return "CType(" + @"dr(""" + column.Name + @"""),float)";
+		case DbType.String: return @"dr(""" + column.Name + @""")" + ".ToString()";
+		case DbType.StringFixedLength: return @"dr(""" + column.Name + @""")" + ".ToString()";
+		case DbType.Time: return "CType(" + @"dr(""" + column.Name + @"""),TimeSpan)";
+		case DbType.UInt16: return "CType(" + @"dr(""" + column.Name + @"""),ushort)";
+		case DbType.UInt32: return "CType(" + @"dr(""" + column.Name + @"""),uint)";
+		case DbType.UInt64: return "CType(" + @"dr(""" + column.Name + @"""),ulong)";
+		case DbType.VarNumeric: return "CType(" + @"dr(""" + column.Name + @"""),decimal)";
+		default:
+		{
+			return "(decimal)" + @"dr(""" + column.Name + @""")" + "object";
+		}
+	}
+}
+
+public string GetPrimaryKeyColumnParameterDeclaration(TableSchema table)
+{
+	string strReturn = "";
+	foreach(ColumnSchema column in table.PrimaryKey.MemberColumns)
+	{
+		strReturn += (strReturn.Length == 0 ? "" : ", ");
+		strReturn += GetCSharpVariableType(column) + " ";
+		strReturn += GetPropertyName(column);
+	}
+	return strReturn;
+}
+
+public string GetCSharpVariableType(ColumnSchema column)
+{
+	if (column.Name.EndsWith("TypeCode")) return column.Name;
+	
+	switch (column.DataType)
+	{
+		case DbType.AnsiString: return "string";
+		case DbType.AnsiStringFixedLength: return "string";
+		case DbType.Binary: return "byte()";
+		case DbType.Boolean: return "boolean";
+		case DbType.Byte: return "byte";
+		case DbType.Currency: return "decimal";
+		case DbType.Date: return "DateTime";
+		case DbType.DateTime: return "DateTime";
+		case DbType.Decimal: return "decimal";
+		case DbType.Double: return "double";
+		case DbType.Guid: return "Guid";
+		case DbType.Int16: return "short";
+		case DbType.Int32: return "int";
+		case DbType.Int64: return "long";
+		case DbType.Object: return "object";
+		case DbType.SByte: return "sbyte";
+		case DbType.Single: return "float";
+		case DbType.String: return "string";
+		case DbType.StringFixedLength: return "string";
+		case DbType.Time: return "TimeSpan";
+		case DbType.UInt16: return "ushort";
+		case DbType.UInt32: return "uint";
+		case DbType.UInt64: return "ulong";
+		case DbType.VarNumeric: return "decimal";
+		default:
+		{
+			return "__UNKNOWN__" + column.NativeType;
+		}
+	}
+}
+</script>
